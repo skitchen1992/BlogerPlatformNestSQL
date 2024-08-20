@@ -41,4 +41,23 @@ export class APISettings {
   public readonly THROTTLER_TTL: string = this.envVariables.THROTTLER_TTL;
   @IsString()
   public readonly THROTTLER_LIMIT: string = this.envVariables.THROTTLER_LIMIT;
+
+  //DATABASE
+  @IsString()
+  public readonly POSTGRES_HOST: string = this.envVariables.POSTGRES_HOST;
+
+  @IsNumber()
+  public readonly POSTGRES_PORT: number = Number(
+    this.envVariables.POSTGRES_PORT,
+  );
+
+  @IsString()
+  public readonly POSTGRES_USER: string = this.envVariables.POSTGRES_USER;
+
+  @IsString()
+  public readonly POSTGRES_PASSWORD: string =
+    this.envVariables.POSTGRES_PASSWORD;
+
+  @IsString()
+  public readonly POSTGRES_DB: string = this.envVariables.POSTGRES_DB;
 }

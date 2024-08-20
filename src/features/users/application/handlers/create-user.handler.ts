@@ -1,8 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UsersRepository } from '@features/users/infrastructure/users.repository';
-import { User } from '@features/users/domain/user.entity';
 import { UsersService } from '@features/users/application/users.service';
-import { getCurrentISOStringDate } from '@utils/dates';
+import { CreateUserDto } from '@features/users/api/dto/input/create-user.input.dto';
 
 export class CreateUserCommand {
   constructor(
@@ -25,11 +24,10 @@ export class CreateUserHandler
 
     const passwordHash = await this.usersService.generatePasswordHash(password);
 
-    const newUser: User = {
+    const newUser: CreateUserDto = {
       login,
       password: passwordHash,
       email,
-      createdAt: getCurrentISOStringDate(),
     };
 
     return await this.usersRepository.create(newUser);

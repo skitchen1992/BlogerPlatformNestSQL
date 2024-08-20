@@ -18,7 +18,7 @@ import { CommentsModule } from '@features/comments/comments.module';
 import { PostsController } from '@features/posts/api/posts.controller';
 import { GetPostHandler } from '@features/posts/application/handlers/get-post.handler';
 import { Like, LikeSchema } from '@features/likes/domain/likes.entity';
-import { User, UserSchema } from '@features/users/domain/user.entity';
+import { User, UserSchema } from '@features/users/domain/user-mongo.entity';
 import { UsersModule } from '@features/users/users.module';
 import { IsBlogExistConstrain } from '@infrastructure/decorators/validate/is-blog-exist.decorator';
 

@@ -19,6 +19,7 @@ import { TestingModule } from '@features/testing/testing.module';
 import { LikesModule } from '@features/likes/likes.module';
 import { SessionModule } from '@features/session/session.module';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
   // Регистрация модулей
@@ -61,6 +62,26 @@ import { ThrottlerModule } from '@nestjs/throttler';
 
         return {
           uri: apiSettings.MONGO_CONNECTION_URI,
+        };
+      },
+      inject: [ConfigService],
+    }),
+    TypeOrmModule.forRootAsync({
+      useFactory: (configService: ConfigService<ConfigurationType, true>) => {
+        const apiSettings = configService.get('apiSettings', { infer: true });
+
+        return {
+          type: 'postgres',
+          host: apiSettings.POSTGRES_HOST,
+          port: apiSettings.POSTGRES_PORT,
+          username: apiSettings.POSTGRES_USER,
+          password: apiSettings.POSTGRES_PASSWORD,
+          database: apiSettings.POSTGRES_DB,
+          ssl: {
+            rejectUnauthorized: false, // Используется SSL-соединение
+          },
+          entities: [__dirname + '/**/*.entity{.ts,.js}'], // Убедитесь, что вы указали все необходимые расширения файлов
+          synchronize: true, // В production используйте миграции
         };
       },
       inject: [ConfigService],

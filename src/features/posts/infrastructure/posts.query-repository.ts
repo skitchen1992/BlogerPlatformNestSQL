@@ -20,7 +20,7 @@ import {
   ParentTypeEnum,
 } from '@features/likes/domain/likes.entity';
 import { NEWEST_LIKES_COUNT } from '@utils/consts';
-import { User, UserModelType } from '@features/users/domain/user.entity';
+import { User, UserModelType } from '@features/users/domain/user-mongo.entity';
 
 @Injectable()
 export class PostsQueryRepository {

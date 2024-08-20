@@ -1,61 +1,35 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Model } from 'mongoose';
-import { getCurrentISOStringDate } from '@utils/dates';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  OneToOne,
+  JoinColumn,
+} from 'typeorm';
+import { EmailConfirmation } from '@features/users/domain/emailConfirmation.entity';
+import { RecoveryCode } from '@features/users/domain/recoveryCode.entity';
 
-interface IEmailConfirmation {
-  isConfirmed: boolean;
-  confirmationCode: string;
-  expirationDate: Date;
-}
-
-export interface RecoveryCode {
-  code: string;
-  isUsed: boolean;
-}
-
-@Schema()
+@Entity('users')
 export class User {
-  @Prop({ type: String, require: true, minlength: 3, maxlength: 10 })
+  @PrimaryGeneratedColumn()
+  id: string;
+
+  @Column({ type: 'varchar', length: 10 })
   login: string;
 
-  @Prop({ type: String, require: true })
+  @Column({ type: 'varchar' })
   password: string;
 
-  @Prop({ type: String, require: true })
+  @Column({ type: 'varchar' })
   email: string;
 
-  @Prop({ type: String, default: getCurrentISOStringDate() })
-  createdAt: string;
+  @Column({ type: 'varchar', default: () => 'NOW' })
+  created_at: string;
 
-  @Prop({
-    type: {
-      isConfirmed: { type: Boolean, default: false },
-      confirmationCode: { type: String, required: true },
-      expirationDate: { type: Date, required: true },
-    },
-    required: false,
-  })
-  emailConfirmation?: IEmailConfirmation;
+  @OneToOne(() => EmailConfirmation, { nullable: true, cascade: true })
+  @JoinColumn()
+  emailConfirmation?: EmailConfirmation;
 
-  @Prop({
-    type: {
-      code: { type: String, required: true },
-      isUsed: { type: Boolean, required: true },
-    },
-    required: false,
-  })
+  @OneToOne(() => RecoveryCode, { nullable: true, cascade: true })
+  @JoinColumn()
   recoveryCode?: RecoveryCode;
 }
-
-export const UserSchema = SchemaFactory.createForClass(User);
-//Для загрузки статических методов
-UserSchema.loadClass(User);
-
-//Types
-export type UserDocument = HydratedDocument<User>;
-
-// type UserModelStaticType = {
-//   createUser: (name: string, email: string) => UserDocument;
-// };
-
-export type UserModelType = Model<UserDocument>; // & UserModelStaticType;

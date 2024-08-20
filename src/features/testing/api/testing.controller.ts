@@ -6,7 +6,7 @@ import {
 } from '@features/comments/domain/comment.entity';
 import { Blog, BlogModelType } from '@features/blogs/domain/blog.entity';
 import { Post, PostModelType } from '@features/posts/domain/post.entity';
-import { User, UserModelType } from '@features/users/domain/user.entity';
+import { User, UserModelType } from '@features/users/domain/user-mongo.entity';
 import { SkipThrottle } from '@nestjs/throttler';
 
 @SkipThrottle()

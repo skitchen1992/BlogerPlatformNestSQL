@@ -11,7 +11,7 @@ import {
   CommentSchema,
 } from '@features/comments/domain/comment.entity';
 import { Blog, BlogSchema } from '@features/blogs/domain/blog.entity';
-import { User, UserSchema } from '@features/users/domain/user.entity';
+import { User, UserSchema } from '@features/users/domain/user-mongo.entity';
 
 @Module({
   imports: [

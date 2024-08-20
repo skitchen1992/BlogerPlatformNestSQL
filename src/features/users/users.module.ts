@@ -1,6 +1,4 @@
 import { Module, Provider } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
-import { User, UserSchema } from '@features/users/domain/user.entity';
 import { UsersRepository } from '@features/users/infrastructure/users.repository';
 import { UsersService } from '@features/users/application/users.service';
 import { UsersQueryRepository } from '@features/users/infrastructure/users.query-repository';
@@ -22,10 +20,7 @@ const usersProviders: Provider[] = [
 ];
 
 @Module({
-  imports: [
-    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
-    SharedModule,
-  ],
+  imports: [SharedModule],
   providers: [...usersProviders],
   controllers: [UsersController],
   exports: [UsersQueryRepository, UsersRepository],
