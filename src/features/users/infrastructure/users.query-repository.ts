@@ -66,70 +66,39 @@ where u.id = $1
     const sortField = validSortFields.includes(sortBy) ? sortBy : 'created_at';
 
     const users = await this.dataSource.query(
-      //    `
-      //  SELECT
-      //      u.id,
-      //      u.login,
-      //      u.password,
-      //      u.email,
-      //      u.created_at,
-      //      rc.is_confirmed AS recovery_is_confirmed,
-      //      rc.confirmation_code AS recovery_confirmation_code,
-      //      rc.expiration_date AS recovery_expiration_date,
-      //      ec.is_confirmed AS email_is_confirmed,
-      //      ec.confirmation_code AS email_confirmation_code,
-      //      ec.expiration_date AS email_expiration_date
-      //  FROM
-      //      users u
-      //  LEFT JOIN
-      //      email_confirmations ec ON u.id = ec.user_id
-      //  LEFT JOIN
-      //      recovery_codes rc ON u.id = rc.user_id
-      // WHERE
-      //      (u.login ILIKE '%' || COALESCE($1, '') || '%')
-      //      AND (u.email ILIKE '%' || COALESCE($2, '') || '%')
-      //  ORDER BY
-      //      ${sortField} ${direction}
-      //  LIMIT $3
-      //  OFFSET ($4 - 1) * $3;
-      //  `,
       `
-
-       SELECT
-           u.id,
-           u.login,
-           u.password,
-           u.email,
-           u.created_at,
-           rc.is_confirmed AS recovery_is_confirmed,
-           rc.confirmation_code AS recovery_confirmation_code,
-           rc.expiration_date AS recovery_expiration_date,
-           ec.is_confirmed AS email_is_confirmed,
-           ec.confirmation_code AS email_confirmation_code,
-           ec.expiration_date AS email_expiration_date
-       FROM
-           users u
-       LEFT JOIN
-           email_confirmations ec ON u.id = ec.user_id
-       LEFT JOIN
-           recovery_codes rc ON u.id = rc.user_id
-      WHERE
-       (
-           ($1::text IS NOT NULL AND u.login ILIKE '%' || $1 || '%') OR
-           ($2::text IS NOT NULL AND u.email ILIKE '%' || $2 || '%')
-       )
-       ORDER BY
-           ${sortField} ${direction}
-       LIMIT $3
-       OFFSET ($4 - 1) * $3;
-
-
-       `,
+  SELECT
+      u.id,
+      u.login,
+      u.password,
+      u.email,
+      u.created_at,
+      rc.is_confirmed AS recovery_is_confirmed,
+      rc.confirmation_code AS recovery_confirmation_code,
+      rc.expiration_date AS recovery_expiration_date,
+      ec.is_confirmed AS email_is_confirmed,
+      ec.confirmation_code AS email_confirmation_code,
+      ec.expiration_date AS email_expiration_date
+  FROM
+      users u
+  LEFT JOIN
+      email_confirmations ec ON u.id = ec.user_id
+  LEFT JOIN
+      recovery_codes rc ON u.id = rc.user_id
+  WHERE
+      ($1::text IS NULL OR u.login ILIKE '%' || $1 || '%')
+      AND ($2::text IS NULL OR u.email ILIKE '%' || $2 || '%')
+  ORDER BY
+      ${sortField} ${direction}
+  LIMIT $3
+  OFFSET $4 * ($5 - 1);
+  `,
       [
         searchLoginTerm || null, // $1
         searchEmailTerm || null, // $2
-        pageSize, // $3
-        pageNumber, // $4
+        pageSize, // $3 (LIMIT)
+        pageSize, // $4 (OFFSET calculation)
+        pageNumber, // $5 (used for OFFSET)
       ],
     );
 

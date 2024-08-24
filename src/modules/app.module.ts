@@ -77,16 +77,19 @@ import { TypeOrmModule } from '@nestjs/typeorm';
         const environmentSettings = configService.get('environmentSettings', {
           infer: true,
         });
+
         const isTestEnv = environmentSettings.isTesting();
+        const isDevelopmentEnv = environmentSettings.isDevelopment();
+        const isLocalEnv = isTestEnv || isDevelopmentEnv;
 
         return {
           type: 'postgres',
-          host: isTestEnv ? 'localhost' : apiSettings.POSTGRES_HOST,
-          port: isTestEnv ? 5432 : apiSettings.POSTGRES_PORT,
-          username: isTestEnv ? 'postgres' : apiSettings.POSTGRES_USER,
-          password: isTestEnv ? 'password' : apiSettings.POSTGRES_PASSWORD,
-          database: isTestEnv ? 'postgres' : apiSettings.POSTGRES_DB,
-          ssl: isTestEnv
+          host: isLocalEnv ? 'localhost' : apiSettings.POSTGRES_HOST,
+          port: isLocalEnv ? 5432 : apiSettings.POSTGRES_PORT,
+          username: isLocalEnv ? 'postgres' : apiSettings.POSTGRES_USER,
+          password: isLocalEnv ? 'password' : apiSettings.POSTGRES_PASSWORD,
+          database: isLocalEnv ? 'postgres' : apiSettings.POSTGRES_DB,
+          ssl: isLocalEnv
             ? false
             : {
                 rejectUnauthorized: false, // Используется SSL-соединение
