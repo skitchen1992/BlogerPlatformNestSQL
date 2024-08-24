@@ -7,7 +7,7 @@ import { ConfigurationType } from '@settings/configuration';
 import { APISettings } from '@settings/api-settings';
 import { EnvironmentSettings } from '@settings/env-settings';
 import { HashBuilder } from '@utils/hash-builder';
-import { SharedService } from '@infrastructure/servises/shared/shared.service';
+//import { SharedService } from '@infrastructure/servises/shared/shared.service';
 import { JwtService } from '@nestjs/jwt/dist/jwt.service';
 import { DataSource } from 'typeorm';
 
@@ -19,7 +19,7 @@ export let environmentSettings: EnvironmentSettings;
 export const hashBuilder = new HashBuilder();
 export const jwtService = new JwtService();
 
-let sharedService: SharedService;
+//let sharedService: SharedService;
 
 beforeAll(async () => {
   const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -41,7 +41,7 @@ beforeAll(async () => {
   app = moduleFixture.createNestApplication();
   dataSource = moduleFixture.get<DataSource>(DataSource);
 
-  sharedService = moduleFixture.get<SharedService>(SharedService);
+  //sharedService = moduleFixture.get<SharedService>(SharedService);
 
   const configService = app.get(ConfigService<ConfigurationType, true>);
 

@@ -67,35 +67,35 @@ where u.id = $1
 
     const users = await this.dataSource.query(
       `
-  SELECT
-      u.id,
-      u.login,
-      u.password,
-      u.email,
-      u.created_at,
-      rc.is_confirmed AS recovery_is_confirmed,
-      rc.confirmation_code AS recovery_confirmation_code,
-      rc.expiration_date AS recovery_expiration_date,
-      ec.is_confirmed AS email_is_confirmed,
-      ec.confirmation_code AS email_confirmation_code,
-      ec.expiration_date AS email_expiration_date
-  FROM
-      users u
-  LEFT JOIN
-      email_confirmations ec ON u.id = ec.user_id
-  LEFT JOIN
-      recovery_codes rc ON u.id = rc.user_id
-  WHERE
-      ($1::text IS NULL OR u.login ILIKE '%' || $1 || '%')
-      AND ($2::text IS NULL OR u.email ILIKE '%' || $2 || '%')
-  ORDER BY
-      ${sortField} ${direction}
-  LIMIT $3
-  OFFSET $4 * ($5 - 1);
-  `,
+    SELECT
+        u.id,
+        u.login,
+        u.password,
+        u.email,
+        u.created_at,
+        rc.is_confirmed AS recovery_is_confirmed,
+        rc.confirmation_code AS recovery_confirmation_code,
+        rc.expiration_date AS recovery_expiration_date,
+        ec.is_confirmed AS email_is_confirmed,
+        ec.confirmation_code AS email_confirmation_code,
+        ec.expiration_date AS email_expiration_date
+    FROM
+        users u
+    LEFT JOIN
+        email_confirmations ec ON u.id = ec.user_id
+    LEFT JOIN
+        recovery_codes rc ON u.id = rc.user_id
+    WHERE
+        ($1::text IS NULL OR u.login ~* $1)
+        OR ($2::text IS NULL OR u.email ~* $2)
+    ORDER BY
+        ${sortField} ${direction}
+    LIMIT $3
+    OFFSET $4 * ($5 - 1);
+    `,
       [
-        searchLoginTerm || null, // $1
-        searchEmailTerm || null, // $2
+        searchLoginTerm ? `.*${searchLoginTerm}.*` : null, // $1
+        searchEmailTerm ? `.*${searchEmailTerm}.*` : null, // $2
         pageSize, // $3 (LIMIT)
         pageSize, // $4 (OFFSET calculation)
         pageNumber, // $5 (used for OFFSET)
@@ -107,10 +107,13 @@ where u.id = $1
     SELECT COUNT(*)::int AS count
     FROM users u
     WHERE
-        ($1::text IS NULL OR u.login ILIKE '%' || $1 || '%')
-        AND ($2::text IS NULL OR u.email ILIKE '%' || $2 || '%');
+        ($1::text IS NULL OR u.login ~* $1)
+        OR ($2::text IS NULL OR u.email ~* $2);
     `,
-      [searchLoginTerm || null, searchEmailTerm || null],
+      [
+        searchLoginTerm ? `.*${searchLoginTerm}.*` : null, // $1
+        searchEmailTerm ? `.*${searchEmailTerm}.*` : null, // $2
+      ],
     );
 
     const userList = users.map((user) => UserOutputDtoMapper(user));
