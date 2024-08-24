@@ -8,7 +8,6 @@ import { Blog, BlogModelType } from '@features/blogs/domain/blog.entity';
 import { Post, PostModelType } from '@features/posts/domain/post.entity';
 import { User, UserModelType } from '@features/users/domain/user-mongo.entity';
 import { SkipThrottle } from '@nestjs/throttler';
-import { dataSource } from '../../../../test/jest.setup';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 
@@ -19,7 +18,8 @@ export class TestingController {
     @InjectModel(Comment.name) private commentsModel: CommentModelType,
     @InjectModel(Blog.name) private blogModel: BlogModelType,
     @InjectModel(Post.name) private postModel: PostModelType,
-    @InjectModel(User.name) private userModel: UserModelType, // @InjectDataSource() private dataSource: DataSource,
+    @InjectModel(User.name) private userModel: UserModelType,
+    @InjectDataSource() private dataSource: DataSource,
   ) {}
 
   @Delete('all-data')
@@ -30,12 +30,12 @@ export class TestingController {
     await this.userModel.deleteMany({});
     await this.commentsModel.deleteMany({});
 
-    // const tables = ['users']; // Список всех таблиц, которые нужно очистить
-    //
-    // for (const table of tables) {
-    //   await dataSource.query(
-    //     `TRUNCATE TABLE ${table} RESTART IDENTITY CASCADE`,
-    //   );
-    // }
+    const tables = ['users']; // Список всех таблиц, которые нужно очистить
+
+    for (const table of tables) {
+      await this.dataSource.query(
+        `TRUNCATE TABLE ${table} RESTART IDENTITY CASCADE`,
+      );
+    }
   }
 }

@@ -268,7 +268,7 @@ describe('Users (e2e) GET', () => {
   });
 });
 
-describe.skip('Users (e2e) POST', () => {
+describe('Users (e2e) POST', () => {
   it('Should add user', async () => {
     const user = testSeeder.createUserDto();
 
@@ -337,7 +337,7 @@ describe.skip('Users (e2e) POST', () => {
   });
 });
 
-describe.skip('Users (e2e) DELETE', () => {
+describe('Users (e2e) DELETE', () => {
   it('Should delete user', async () => {
     const user = testSeeder.createUserDto();
 

@@ -65,6 +65,28 @@ where u.id = $1
     const validSortFields = ['created_at', 'login', 'email'];
     const sortField = validSortFields.includes(sortBy) ? sortBy : 'created_at';
 
+    let whereConditions = '';
+    const queryParams: any[] = [];
+
+    if (searchLoginTerm && searchEmailTerm) {
+      whereConditions = `
+      (u.login ~* $1 OR u.email ~* $2)
+    `;
+      queryParams.push(`.*${searchLoginTerm}.*`, `.*${searchEmailTerm}.*`);
+    } else {
+      if (searchLoginTerm) {
+        whereConditions = `u.login ~* $1`;
+        queryParams.push(`.*${searchLoginTerm}.*`);
+      }
+      if (searchEmailTerm) {
+        if (whereConditions) {
+          whereConditions += ' OR ';
+        }
+        whereConditions += `u.email ~* $1`;
+        queryParams.push(`.*${searchEmailTerm}.*`);
+      }
+    }
+
     const users = await this.dataSource.query(
       `
     SELECT
@@ -86,19 +108,19 @@ where u.id = $1
     LEFT JOIN
         recovery_codes rc ON u.id = rc.user_id
     WHERE
-        ($1::text IS NULL OR u.login ~* $1)
-        OR ($2::text IS NULL OR u.email ~* $2)
+        ${
+          whereConditions || 'TRUE'
+        }  -- Ensures WHERE clause is valid even if no search term
     ORDER BY
         ${sortField} ${direction}
-    LIMIT $3
-    OFFSET $4 * ($5 - 1);
+    LIMIT $${queryParams.length + 1}
+    OFFSET $${queryParams.length + 2} * ($${queryParams.length + 3} - 1);
     `,
       [
-        searchLoginTerm ? `.*${searchLoginTerm}.*` : null, // $1
-        searchEmailTerm ? `.*${searchEmailTerm}.*` : null, // $2
-        pageSize, // $3 (LIMIT)
-        pageSize, // $4 (OFFSET calculation)
-        pageNumber, // $5 (used for OFFSET)
+        ...queryParams,
+        pageSize, // LIMIT
+        pageSize, // OFFSET calculation
+        pageNumber, // used for OFFSET
       ],
     );
 
@@ -107,13 +129,9 @@ where u.id = $1
     SELECT COUNT(*)::int AS count
     FROM users u
     WHERE
-        ($1::text IS NULL OR u.login ~* $1)
-        OR ($2::text IS NULL OR u.email ~* $2);
+        ${whereConditions || 'TRUE'}
     `,
-      [
-        searchLoginTerm ? `.*${searchLoginTerm}.*` : null, // $1
-        searchEmailTerm ? `.*${searchEmailTerm}.*` : null, // $2
-      ],
+      queryParams,
     );
 
     const userList = users.map((user) => UserOutputDtoMapper(user));
