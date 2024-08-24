@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
 import {
   UserOutputDto,
   UserOutputDtoMapper,
@@ -49,26 +48,109 @@ where u.id = $1
   }
 
   public async getAll(query: UsersQuery): Promise<UserOutputPaginationDto> {
-    const pagination = this.pagination.getUsers(query);
+    const {
+      searchLoginTerm,
+      searchEmailTerm,
+      sortBy = 'createdAt',
+      sortDirection = 'desc',
+      pageNumber = 1,
+      pageSize = 10,
+    } = query;
 
-    // const users = await this.userModel
-    //   .find(pagination.query)
-    //   .sort(pagination.sort)
-    //   .skip(pagination.skip)
-    //   .limit(pagination.pageSize)
-    //   .lean();
-    const users = [];
+    const validSortDirections = ['asc', 'desc'];
+    const direction = validSortDirections.includes(sortDirection)
+      ? sortDirection
+      : 'desc';
 
-    const totalCount = 0;
+    const validSortFields = ['created_at', 'login', 'email'];
+    const sortField = validSortFields.includes(sortBy) ? sortBy : 'created_at';
 
-    // @ts-ignore
+    const users = await this.dataSource.query(
+      //    `
+      //  SELECT
+      //      u.id,
+      //      u.login,
+      //      u.password,
+      //      u.email,
+      //      u.created_at,
+      //      rc.is_confirmed AS recovery_is_confirmed,
+      //      rc.confirmation_code AS recovery_confirmation_code,
+      //      rc.expiration_date AS recovery_expiration_date,
+      //      ec.is_confirmed AS email_is_confirmed,
+      //      ec.confirmation_code AS email_confirmation_code,
+      //      ec.expiration_date AS email_expiration_date
+      //  FROM
+      //      users u
+      //  LEFT JOIN
+      //      email_confirmations ec ON u.id = ec.user_id
+      //  LEFT JOIN
+      //      recovery_codes rc ON u.id = rc.user_id
+      // WHERE
+      //      (u.login ILIKE '%' || COALESCE($1, '') || '%')
+      //      AND (u.email ILIKE '%' || COALESCE($2, '') || '%')
+      //  ORDER BY
+      //      ${sortField} ${direction}
+      //  LIMIT $3
+      //  OFFSET ($4 - 1) * $3;
+      //  `,
+      `
+
+       SELECT
+           u.id,
+           u.login,
+           u.password,
+           u.email,
+           u.created_at,
+           rc.is_confirmed AS recovery_is_confirmed,
+           rc.confirmation_code AS recovery_confirmation_code,
+           rc.expiration_date AS recovery_expiration_date,
+           ec.is_confirmed AS email_is_confirmed,
+           ec.confirmation_code AS email_confirmation_code,
+           ec.expiration_date AS email_expiration_date
+       FROM
+           users u
+       LEFT JOIN
+           email_confirmations ec ON u.id = ec.user_id
+       LEFT JOIN
+           recovery_codes rc ON u.id = rc.user_id
+      WHERE
+       (
+           ($1::text IS NOT NULL AND u.login ILIKE '%' || $1 || '%') OR
+           ($2::text IS NOT NULL AND u.email ILIKE '%' || $2 || '%')
+       )
+       ORDER BY
+           ${sortField} ${direction}
+       LIMIT $3
+       OFFSET ($4 - 1) * $3;
+
+
+       `,
+      [
+        searchLoginTerm || null, // $1
+        searchEmailTerm || null, // $2
+        pageSize, // $3
+        pageNumber, // $4
+      ],
+    );
+
+    const totalCount = await this.dataSource.query(
+      `
+    SELECT COUNT(*)::int AS count
+    FROM users u
+    WHERE
+        ($1::text IS NULL OR u.login ILIKE '%' || $1 || '%')
+        AND ($2::text IS NULL OR u.email ILIKE '%' || $2 || '%');
+    `,
+      [searchLoginTerm || null, searchEmailTerm || null],
+    );
+
     const userList = users.map((user) => UserOutputDtoMapper(user));
 
     return UserOutputPaginationDtoMapper(
       userList,
-      totalCount,
-      pagination.pageSize,
-      pagination.page,
+      totalCount.at(0).count,
+      Number(pageSize),
+      Number(pageNumber),
     );
   }
 }

@@ -38,8 +38,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       inject: [ConfigService],
       useFactory: (configService: ConfigService<ConfigurationType, true>) => {
         const apiSettings = configService.get('apiSettings', { infer: true });
-        if (process.env.NODE_ENV === 'test') {
-          // Отключение троттлинга в тестовой среде
+        const environmentSettings = configService.get('environmentSettings', {
+          infer: true,
+        });
+        const isTestEnv = environmentSettings.isTesting();
+
+        // Отключение троттлинга в тестовой среде
+        if (isTestEnv) {
           return [
             {
               ttl: 0,
@@ -69,17 +74,23 @@ import { TypeOrmModule } from '@nestjs/typeorm';
     TypeOrmModule.forRootAsync({
       useFactory: (configService: ConfigService<ConfigurationType, true>) => {
         const apiSettings = configService.get('apiSettings', { infer: true });
+        const environmentSettings = configService.get('environmentSettings', {
+          infer: true,
+        });
+        const isTestEnv = environmentSettings.isTesting();
 
         return {
           type: 'postgres',
-          host: apiSettings.POSTGRES_HOST,
-          port: apiSettings.POSTGRES_PORT,
-          username: apiSettings.POSTGRES_USER,
-          password: apiSettings.POSTGRES_PASSWORD,
-          database: apiSettings.POSTGRES_DB,
-          ssl: {
-            rejectUnauthorized: false, // Используется SSL-соединение
-          },
+          host: isTestEnv ? 'localhost' : apiSettings.POSTGRES_HOST,
+          port: isTestEnv ? 5432 : apiSettings.POSTGRES_PORT,
+          username: isTestEnv ? 'postgres' : apiSettings.POSTGRES_USER,
+          password: isTestEnv ? 'password' : apiSettings.POSTGRES_PASSWORD,
+          database: isTestEnv ? 'postgres' : apiSettings.POSTGRES_DB,
+          ssl: isTestEnv
+            ? false
+            : {
+                rejectUnauthorized: false, // Используется SSL-соединение
+              },
           entities: [__dirname + '/**/*.entity{.ts,.js}'], // Убедитесь, что вы указали все необходимые расширения файлов
           synchronize: true, // В production используйте миграции
         };
