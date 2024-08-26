@@ -29,12 +29,11 @@ SELECT  u.id,
         u.created_at,
         rc.is_confirmed AS recovery_is_confirmed,
         rc.confirmation_code AS recovery_confirmation_code,
-        rc.expiration_date AS recovery_expiration_date,
         ec.is_confirmed AS email_is_confirmed,
         ec.confirmation_code AS email_confirmation_code,
         ec.expiration_date AS email_expiration_date FROM users u 
 LEFT join email_confirmations ec ON u.id = ec.user_id 
-LEFT join recovery_codes rc ON u.id = rc.user_id
+LEFT join recovery_code rc ON u.id = rc.user_id
 where u.id = $1
     `,
       [userId],
@@ -97,7 +96,6 @@ where u.id = $1
         u.created_at,
         rc.is_confirmed AS recovery_is_confirmed,
         rc.confirmation_code AS recovery_confirmation_code,
-        rc.expiration_date AS recovery_expiration_date,
         ec.is_confirmed AS email_is_confirmed,
         ec.confirmation_code AS email_confirmation_code,
         ec.expiration_date AS email_expiration_date
@@ -106,7 +104,7 @@ where u.id = $1
     LEFT JOIN
         email_confirmations ec ON u.id = ec.user_id
     LEFT JOIN
-        recovery_codes rc ON u.id = rc.user_id
+        recovery_code rc ON u.id = rc.user_id
     WHERE
         ${
           whereConditions || 'TRUE'

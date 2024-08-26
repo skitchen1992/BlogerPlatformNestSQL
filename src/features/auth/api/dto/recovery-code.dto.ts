@@ -1,12 +1,6 @@
 export class RecoveryCodeDto {
-  recoveryCode: {
-    code?: string;
-    isUsed?: boolean;
-  };
-
-  constructor() {
-    this.recoveryCode = {};
-  }
+  confirmationCode: string;
+  isConfirmed: boolean;
 }
 
 // MAPPERS
@@ -14,8 +8,8 @@ export class RecoveryCodeDto {
 export const RecoveryCodeDtoMapper = (code: string): RecoveryCodeDto => {
   const outputDto = new RecoveryCodeDto();
 
-  outputDto.recoveryCode.code = code;
-  outputDto.recoveryCode.isUsed = false;
+  outputDto.confirmationCode = code;
+  outputDto.isConfirmed = false;
 
   return outputDto;
 };

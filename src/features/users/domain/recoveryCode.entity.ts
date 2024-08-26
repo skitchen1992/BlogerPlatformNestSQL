@@ -7,7 +7,7 @@ import {
 } from 'typeorm';
 import { User } from '@features/users/domain/user.entity';
 
-@Entity('recovery_codes')
+@Entity('recovery_code')
 export class RecoveryCode {
   @PrimaryGeneratedColumn({ type: 'bigint' })
   id: number;
@@ -16,10 +16,10 @@ export class RecoveryCode {
   user_id: string;
 
   @Column({ type: 'varchar' })
-  code: string;
+  confirmation_code: string;
 
   @Column({ type: 'boolean' })
-  is_used: boolean;
+  is_confirmed: boolean;
 
   @OneToOne(() => User, (user) => user.recoveryCode, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })

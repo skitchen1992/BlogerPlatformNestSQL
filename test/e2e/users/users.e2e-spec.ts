@@ -75,8 +75,8 @@ describe('Users (e2e) GET', () => {
       items: [
         expect.objectContaining({
           id: expect.any(String),
-          login: userList[1].login,
-          email: userList[1].email,
+          login: userList[2].login,
+          email: userList[2].email,
           createdAt: expect.any(String),
         }),
       ],

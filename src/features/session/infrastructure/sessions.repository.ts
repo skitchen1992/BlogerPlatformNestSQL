@@ -18,10 +18,6 @@ export class SessionsRepository {
 
   public async getSessionByDeviceId(deviceId: string): Promise<Session | null> {
     try {
-      // const devise = await this.sessionModel
-      //   .findOne({ deviceId: deviceId })
-      //   .lean();
-
       const devise = await this.dataSource.query(
         `
       SELECT * FROM sessions s

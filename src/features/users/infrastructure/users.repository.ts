@@ -5,6 +5,7 @@ import { DataSource } from 'typeorm';
 import { User } from '@features/users/domain/user.entity';
 import { UserDocument } from '@features/users/domain/user-mongo.entity';
 import { EmailConfirmation } from '@features/users/domain/emailConfirmation.entity';
+import { RecoveryCodeDto } from '@features/auth/api/dto/recovery-code.dto';
 
 @Injectable()
 export class UsersRepository {
@@ -70,8 +71,8 @@ export class UsersRepository {
     try {
       await this.dataSource.query(
         `
-DELETE from users 
-WHERE id = $1
+        DELETE from users 
+        WHERE id = $1
     `,
         [userId],
       );
@@ -87,6 +88,43 @@ WHERE id = $1
       // const updatedResult = await this.userModel.updateOne({ _id: id }, data);
 
       return false;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  public async insertRecoveryCode(
+    userId: string,
+    recoveryCodeDto: RecoveryCodeDto,
+  ): Promise<boolean> {
+    try {
+      // Попытка обновления записи с указанным user_id
+      const updateResult = await this.dataSource.query(
+        `
+      UPDATE recovery_code
+      SET confirmation_code = $1, is_confirmed = $2
+      WHERE user_id = $3
+      RETURNING id;
+      `,
+        [recoveryCodeDto.confirmationCode, recoveryCodeDto.isConfirmed, userId],
+      );
+
+      // Если запись обновлена, возвращаем true
+      if (Boolean(updateResult.at(1))) {
+        return true;
+      }
+
+      // Если запись не была найдена и обновлена, вставляем новую запись
+      const insertResult = await this.dataSource.query(
+        `
+      INSERT INTO recovery_code (user_id, confirmation_code, is_confirmed)
+      VALUES ($1, $2, $3)
+      RETURNING id;
+      `,
+        [userId, recoveryCodeDto.confirmationCode, recoveryCodeDto.isConfirmed],
+      );
+
+      return Boolean(insertResult.length);
     } catch (e) {
       return false;
     }
@@ -150,7 +188,6 @@ WHERE id = $1
         u.created_at,
         rc.is_confirmed AS recovery_is_confirmed,
         rc.confirmation_code AS recovery_confirmation_code,
-        rc.expiration_date AS recovery_expiration_date,
         ec.is_confirmed AS email_is_confirmed,
         ec.confirmation_code AS email_confirmation_code,
         ec.expiration_date AS email_expiration_date
@@ -159,7 +196,7 @@ WHERE id = $1
     LEFT JOIN
         email_confirmations ec ON u.id = ec.user_id
     LEFT JOIN
-        recovery_codes rc ON u.id = rc.user_id
+        recovery_code rc ON u.id = rc.user_id
      WHERE u.login = $1 OR u.email = $2
     `,
       [
