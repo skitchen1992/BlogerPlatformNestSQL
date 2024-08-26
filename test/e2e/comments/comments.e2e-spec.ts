@@ -114,7 +114,7 @@
 // });
 //
 // describe(`Endpoint (PUT) - /comments`, () => {
-//   it('Should update comment', async () => {
+//   it('Should updatePassword comment', async () => {
 //     const login = 'testLogin';
 //     const password = 'string';
 //

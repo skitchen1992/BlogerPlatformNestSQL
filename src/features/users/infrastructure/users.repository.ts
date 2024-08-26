@@ -1,26 +1,49 @@
 import { Injectable } from '@nestjs/common';
-import { UpdateQuery } from 'mongoose';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { User } from '@features/users/domain/user.entity';
 import { UserDocument } from '@features/users/domain/user-mongo.entity';
 import { EmailConfirmation } from '@features/users/domain/emailConfirmation.entity';
 import { RecoveryCodeDto } from '@features/auth/api/dto/recovery-code.dto';
+import { UserDetails } from '@features/users/api/dto/UserDetais';
 
 @Injectable()
 export class UsersRepository {
   constructor(@InjectDataSource() private dataSource: DataSource) {}
 
-  public async get(userId: string): Promise<UserDocument | null> {
+  public async get(userId: string): Promise<UserDetails | null> {
     try {
-      //const user = await this.userModel.findById(userId).lean();
-      const user = null;
+      const user = await this.dataSource.query(
+        `
+    SELECT
+        u.id,
+        u.login,
+        u.password,
+        u.email,
+        u.created_at,
+        rc.is_confirmed AS recovery_is_confirmed,
+        rc.confirmation_code AS recovery_confirmation_code,
+        ec.is_confirmed AS email_is_confirmed,
+        ec.confirmation_code AS email_confirmation_code,
+        ec.expiration_date AS email_expiration_date
+    FROM
+        users u
+    LEFT JOIN
+        email_confirmations ec ON u.id = ec.user_id
+    LEFT JOIN
+        recovery_code rc ON u.id = rc.user_id
+     WHERE u.id = $1
+    `,
+        [
+          userId, //$1
+        ],
+      );
 
-      if (!user) {
+      if (!user.at(0)) {
         return null;
       }
 
-      return user;
+      return user.at(0);
     } catch (e) {
       return null;
     }
@@ -83,11 +106,22 @@ export class UsersRepository {
     }
   }
 
-  public async update(id: string, data: UpdateQuery<User>): Promise<boolean> {
+  public async updatePassword(
+    userId: string,
+    password: string,
+  ): Promise<boolean> {
     try {
-      // const updatedResult = await this.userModel.updateOne({ _id: id }, data);
+      const updateResult = await this.dataSource.query(
+        `
+      UPDATE users
+      SET password = $1
+      WHERE id = $2
+      RETURNING id;
+      `,
+        [password, userId],
+      );
 
-      return false;
+      return Boolean(updateResult.at(1));
     } catch (e) {
       return false;
     }

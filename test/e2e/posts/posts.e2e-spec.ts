@@ -409,7 +409,7 @@
 // });
 //
 // describe(`Endpoint (PUT) - /posts/:id`, () => {
-//   it('Should update post', async () => {
+//   it('Should updatePassword post', async () => {
 //     const blogList = await mockBlogModel.insertMany(
 //       testSeeder.createBlogListDto(1),
 //     );

@@ -343,7 +343,7 @@
 // });
 //
 // describe.skip(`Blogs (e2e) PUT - /:blogId/posts`, () => {
-//   it('Should update blog', async () => {
+//   it('Should updatePassword blog', async () => {
 //     const result = await mockBlogModel.insertMany(
 //       testSeeder.createBlogListDto(1),
 //     );
