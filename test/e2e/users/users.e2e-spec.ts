@@ -53,11 +53,11 @@ describe('Users (e2e) GET', () => {
     for (const user of userList) {
       await dataSource.query(
         `
-      INSERT INTO users (login, password, email, created_at)
-      VALUES ($1, $2, $3, $4)
+      INSERT INTO users (login, password, email)
+      VALUES ($1, $2, $3)
       RETURNING id;
     `,
-        [user.login, user.password, user.email, user.created_at],
+        [user.login, user.password, user.email],
       );
     }
 
@@ -75,8 +75,8 @@ describe('Users (e2e) GET', () => {
       items: [
         expect.objectContaining({
           id: expect.any(String),
-          login: userList[2].login,
-          email: userList[2].email,
+          login: userList[1].login,
+          email: userList[1].email,
           createdAt: expect.any(String),
         }),
       ],
