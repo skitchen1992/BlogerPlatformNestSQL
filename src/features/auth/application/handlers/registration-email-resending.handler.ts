@@ -55,6 +55,7 @@ export class RegistrationEmailResendingHandler
     const confirmationCode = getUniqueId();
 
     await this.usersRepository.updateUserFieldById(
+      //@ts-ignore
       user._id.toString(),
       'emailConfirmation.confirmationCode',
       confirmationCode,

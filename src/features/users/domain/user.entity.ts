@@ -4,14 +4,16 @@ import {
   PrimaryGeneratedColumn,
   OneToOne,
   JoinColumn,
+  OneToMany,
 } from 'typeorm';
 import { EmailConfirmation } from '@features/users/domain/emailConfirmation.entity';
 import { RecoveryCode } from '@features/users/domain/recoveryCode.entity';
+import { Session } from '@features/session/domain/session.entity';
 
 @Entity('users')
 export class User {
-  @PrimaryGeneratedColumn()
-  id: string;
+  @PrimaryGeneratedColumn('uuid')
+  id?: string;
 
   @Column({ type: 'varchar', length: 10 })
   login: string;
@@ -22,14 +24,17 @@ export class User {
   @Column({ type: 'varchar' })
   email: string;
 
-  @Column({ type: 'varchar', default: () => 'NOW' })
+  @Column({ type: 'timestamptz', default: () => 'NOW' })
   created_at: string;
 
   @OneToOne(() => EmailConfirmation, { nullable: true, cascade: true })
-  @JoinColumn()
+  @JoinColumn({ name: 'user_id' })
   emailConfirmation?: EmailConfirmation;
 
   @OneToOne(() => RecoveryCode, { nullable: true, cascade: true })
-  @JoinColumn()
+  @JoinColumn({ name: 'user_id' })
   recoveryCode?: RecoveryCode;
+
+  @OneToMany(() => Session, (session) => session.user)
+  sessions?: Session[];
 }

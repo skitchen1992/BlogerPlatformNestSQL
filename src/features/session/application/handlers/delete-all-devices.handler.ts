@@ -4,7 +4,7 @@ import { COOKIE_KEY } from '@utils/consts';
 import { CookieService } from '@infrastructure/servises/cookie/cookie.service';
 import { UnauthorizedException } from '@nestjs/common';
 import { SessionsRepository } from '@features/session/infrastructure/sessions.repository';
-import { Session } from '@features/session/domain/session.entity';
+import { Session } from '@features/session/domain/session-mongo.entity';
 import { SharedService } from '@infrastructure/servises/shared/shared.service';
 
 export class DeleteAllDevicesCommand {

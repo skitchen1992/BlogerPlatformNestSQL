@@ -1,8 +1,8 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UsersRepository } from '@features/users/infrastructure/users.repository';
 import { UsersService } from '@features/users/application/users.service';
-import { User } from '@features/users/domain/user-mongo.entity';
 import { getCurrentISOStringDate } from '@utils/dates';
+import { User } from '@features/users/domain/user.entity';
 
 export class CreateUserCommand {
   constructor(
@@ -29,7 +29,7 @@ export class CreateUserHandler
       login,
       password: passwordHash,
       email,
-      createdAt: getCurrentISOStringDate(),
+      created_at: getCurrentISOStringDate(),
     };
 
     return await this.usersRepository.create(newUser);

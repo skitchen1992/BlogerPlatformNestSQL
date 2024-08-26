@@ -1,16 +1,30 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  OneToOne,
+  JoinColumn,
+} from 'typeorm';
+import { User } from '@features/users/domain/user.entity';
 
 @Entity('email_confirmations')
 export class EmailConfirmation {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ type: 'bigint' })
+  id?: number;
+
+  @Column({ type: 'uuid' })
   user_id: string;
 
   @Column({ type: 'boolean', default: false })
-  isConfirmed: boolean;
+  is_confirmed: boolean;
 
   @Column({ type: 'varchar' })
-  confirmationCode: string;
+  confirmation_code: string;
 
-  @Column({ type: 'timestamp with local time zone' })
-  expirationDate: Date;
+  @Column({ type: 'timestamptz' })
+  expiration_date: Date;
+
+  @OneToOne(() => User, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'user_id' })
+  user?: User;
 }

@@ -11,10 +11,10 @@ import { COOKIE_KEY } from '@utils/consts';
 import { Response, Request } from 'express';
 import { SharedService } from '@infrastructure/servises/shared/shared.service';
 import { SessionsRepository } from '@features/session/infrastructure/sessions.repository';
-import { getCurrentISOStringDate } from '@utils/dates';
-import { Session } from '@features/session/domain/session.entity';
 import { ConfigService } from '@nestjs/config';
 import { ConfigurationType } from '@settings/configuration';
+import { Session } from '@features/session/domain/session.entity';
+
 export class LoginCommand {
   constructor(
     public loginOrEmail: string,
@@ -57,7 +57,7 @@ export class LoginHandler
     }
 
     const deviceId = getUniqueId();
-    const userId = user._id.toString();
+    const userId = user.id!;
     const apiSettings = this.configService.get('apiSettings', { infer: true });
 
     const refreshToken = await this.sharedService.getRefreshToken(
@@ -70,14 +70,14 @@ export class LoginHandler
     const ipAddress = req.ip || 'unknown';
 
     const newSession: Session = {
-      userId,
+      user_id: userId,
       ip: ipAddress,
       title: userAgentHeader,
-      lastActiveDate: getCurrentISOStringDate(),
-      tokenIssueDate: getCurrentISOStringDate(),
-      tokenExpirationDate:
-        this.sharedService.getTokenExpirationDate(refreshToken),
-      deviceId,
+      last_active_date: new Date(),
+      token_issue_date: new Date(),
+      token_expiration_date:
+        this.sharedService.getTokenExpirationDate(refreshToken)!,
+      device_id: deviceId,
     };
 
     await this.sessionsRepository.create(newSession);

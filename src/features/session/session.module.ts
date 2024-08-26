@@ -3,7 +3,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import {
   Session,
   SessionSchema,
-} from '@features/session/domain/session.entity';
+} from '@features/session/domain/session-mongo.entity';
 import { SessionsRepository } from '@features/session/infrastructure/sessions.repository';
 import { SessionsQueryRepository } from '@features/session/infrastructure/sessions.query-repository';
 import { SessionController } from '@features/session/api/session.controller';

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Session, SessionModelType } from '../domain/session.entity';
+import { Session, SessionModelType } from '../domain/session-mongo.entity';
 import { InjectModel } from '@nestjs/mongoose';
 import { getCurrentISOStringDate } from '@utils/dates';
 import { AllDevicesOutputDtoMapper } from '@features/session/api/dto/output/allDevices.output.dto';

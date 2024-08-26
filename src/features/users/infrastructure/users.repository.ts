@@ -2,7 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { UpdateQuery } from 'mongoose';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { User, UserDocument } from '@features/users/domain/user-mongo.entity';
+import { User } from '@features/users/domain/user.entity';
+import { UserDocument } from '@features/users/domain/user-mongo.entity';
+import { EmailConfirmation } from '@features/users/domain/emailConfirmation.entity';
 
 @Injectable()
 export class UsersRepository {
@@ -23,7 +25,10 @@ export class UsersRepository {
     }
   }
 
-  public async create(newUser: User): Promise<string> {
+  public async create(
+    newUser: User,
+    emailConfirmation?: EmailConfirmation,
+  ): Promise<string> {
     try {
       const result = await this.dataSource.query(
         `
@@ -36,7 +41,7 @@ export class UsersRepository {
 
       const userId = result[0].id;
 
-      if (newUser.emailConfirmation) {
+      if (emailConfirmation) {
         await this.dataSource.query(
           `
       INSERT INTO email_confirmations (user_id, is_confirmed, confirmation_code, expiration_date)
@@ -45,9 +50,9 @@ export class UsersRepository {
     `,
           [
             userId,
-            newUser.emailConfirmation.isConfirmed,
-            newUser.emailConfirmation.confirmationCode,
-            newUser.emailConfirmation.expirationDate,
+            emailConfirmation.isConfirmed,
+            emailConfirmation.confirmationCode,
+            emailConfirmation.expirationDate,
           ],
         );
       }
@@ -132,7 +137,7 @@ WHERE id = $1
     login: string,
     email: string,
   ): Promise<{
-    user: UserDocument | null;
+    user: User | null;
     foundBy: string | null;
   }> {
     const user = await this.dataSource.query(
@@ -168,7 +173,7 @@ WHERE id = $1
     }
 
     const foundBy = user.at(0)?.login === login ? 'login' : 'email';
-    return { user, foundBy };
+    return { user: user.at(0), foundBy };
   }
 
   public async getUserByConfirmationCode(

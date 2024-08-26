@@ -1,4 +1,4 @@
-import { SessionDocument } from '@features/session/domain/session.entity';
+import { SessionDocument } from '@features/session/domain/session-mongo.entity';
 
 export class AllDevicesOutputDto {
   ip: string;

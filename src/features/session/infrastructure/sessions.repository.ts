@@ -1,16 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import {
-  Session,
   SessionDocument,
   SessionModelType,
-} from '../domain/session.entity';
+} from '../domain/session-mongo.entity';
 import { UpdateQuery } from 'mongoose';
+import { InjectDataSource } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
+import { Session } from '@features/session/domain/session.entity';
 
 @Injectable()
 export class SessionsRepository {
   constructor(
     @InjectModel(Session.name) private sessionModel: SessionModelType,
+    @InjectDataSource() private dataSource: DataSource,
   ) {}
 
   public async getSessionByDeviceId(
@@ -32,9 +35,31 @@ export class SessionsRepository {
   }
 
   public async create(newSession: Session): Promise<string> {
-    const insertResult = await this.sessionModel.insertMany([newSession]);
+    try {
+      const result = await this.dataSource.query(
+        `
+      INSERT INTO sessions (user_id, ip, title, last_active_date, token_issue_date, token_expiration_date, device_id)
+      VALUES ($1, $2, $3, $4, $5, $6, $7)
+      RETURNING id;
+    `,
+        [
+          newSession.user_id,
+          newSession.ip,
+          newSession.title,
+          newSession.last_active_date,
+          newSession.token_issue_date,
+          newSession.token_expiration_date,
+          newSession.device_id,
+        ],
+      );
 
-    return insertResult[0].id;
+      return result[0].id;
+    } catch (e) {
+      console.error('Error inserting user into database', {
+        error: e,
+      });
+      return '';
+    }
   }
 
   public async delete(id: string): Promise<boolean> {

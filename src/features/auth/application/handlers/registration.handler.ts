@@ -4,7 +4,8 @@ import { BadRequestException } from '@nestjs/common';
 import { add, getCurrentISOStringDate } from '@utils/dates';
 import { getUniqueId } from '@utils/utils';
 import { SharedService } from '@infrastructure/servises/shared/shared.service';
-import { User } from '@features/users/domain/user-mongo.entity';
+import { User } from '@features/users/domain/user.entity';
+import { EmailConfirmation } from '@features/users/domain/emailConfirmation.entity';
 
 export class RegistrationCommand {
   constructor(
@@ -46,15 +47,16 @@ export class RegistrationHandler
       login,
       password: passwordHash,
       email,
-      createdAt: getCurrentISOStringDate(),
-      emailConfirmation: {
-        isConfirmed: false,
-        confirmationCode,
-        expirationDate: add(getCurrentISOStringDate(), { hours: 1 }),
-      },
+      created_at: getCurrentISOStringDate(),
     };
 
-    await this.usersRepository.create(newUser);
+    const emailConfirmation: EmailConfirmation = {
+      is_confirmed: false,
+      confirmation_code: confirmationCode,
+      expiration_date: add(getCurrentISOStringDate(), { hours: 1 }),
+    };
+
+    await this.usersRepository.create(newUser, emailConfirmation);
 
     await this.sharedService.sendRegisterEmail(email, confirmationCode);
   }

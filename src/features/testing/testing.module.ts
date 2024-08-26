@@ -5,7 +5,7 @@ import { TestingController } from '@features/testing/api/testing.controller';
 import {
   Session,
   SessionSchema,
-} from '@features/session/domain/session.entity';
+} from '@features/session/domain/session-mongo.entity';
 import {
   Comment,
   CommentSchema,

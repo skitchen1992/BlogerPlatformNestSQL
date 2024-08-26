@@ -12,7 +12,7 @@ export class UserOutputDto {
 export const UserOutputDtoMapper = (user: User): UserOutputDto => {
   const outputDto = new UserOutputDto();
 
-  outputDto.id = user.id;
+  outputDto.id = user.id!;
   outputDto.login = user.login;
   outputDto.email = user.email;
   outputDto.createdAt = user.created_at;

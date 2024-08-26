@@ -14,7 +14,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import {
   Session,
   SessionSchema,
-} from '@features/session/domain/session.entity';
+} from '@features/session/domain/session-mongo.entity';
 import { SessionModule } from '@features/session/session.module';
 import { LogoutHandler } from '@features/auth/application/handlers/logout.handler';
 

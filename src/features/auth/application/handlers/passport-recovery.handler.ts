@@ -31,7 +31,7 @@ export class PasswordRecoveryHandler
       );
       return;
     }
-
+    //@ts-ignore
     const userId = user._id.toString();
 
     const recoveryAccessToken = await this.sharedService.getAccessToken(userId);

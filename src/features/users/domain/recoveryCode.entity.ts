@@ -1,13 +1,27 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  JoinColumn,
+  OneToOne,
+} from 'typeorm';
+import { User } from '@features/users/domain/user.entity';
 
 @Entity('recovery_codes')
 export class RecoveryCode {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ type: 'bigint' })
+  id: number;
+
+  @Column({ type: 'uuid' })
   user_id: string;
 
   @Column({ type: 'varchar' })
   code: string;
 
   @Column({ type: 'boolean' })
-  isUsed: boolean;
+  is_used: boolean;
+
+  @OneToOne(() => User, (user) => user.recoveryCode, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'user_id' })
+  user: User;
 }
