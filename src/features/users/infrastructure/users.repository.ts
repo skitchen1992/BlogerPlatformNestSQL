@@ -2,9 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { UpdateQuery } from 'mongoose';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { UserDocument } from '@features/users/domain/user-mongo.entity';
-import { User } from '@features/users/domain/user.entity';
-import { CreateUserDto } from '@features/users/api/dto/input/create-user.input.dto';
+import { User, UserDocument } from '@features/users/domain/user-mongo.entity';
 
 @Injectable()
 export class UsersRepository {
@@ -25,7 +23,7 @@ export class UsersRepository {
     }
   }
 
-  public async create(newUser: CreateUserDto): Promise<string> {
+  public async create(newUser: User): Promise<string> {
     try {
       const result = await this.dataSource.query(
         `
@@ -36,7 +34,25 @@ export class UsersRepository {
         [newUser.login, newUser.password, newUser.email, new Date()],
       );
 
-      return result[0].id;
+      const userId = result[0].id;
+
+      if (newUser.emailConfirmation) {
+        await this.dataSource.query(
+          `
+      INSERT INTO email_confirmations (user_id, is_confirmed, confirmation_code, expiration_date)
+      VALUES ($1, $2, $3, $4)
+      RETURNING id;
+    `,
+          [
+            userId,
+            newUser.emailConfirmation.isConfirmed,
+            newUser.emailConfirmation.confirmationCode,
+            newUser.emailConfirmation.expirationDate,
+          ],
+        );
+      }
+
+      return userId;
     } catch (e) {
       console.error('Error inserting user into database', {
         error: e,
@@ -119,20 +135,39 @@ WHERE id = $1
     user: UserDocument | null;
     foundBy: string | null;
   }> {
-    // const user = await this.userModel
-    //   .findOne({
-    //     $or: [{ login }, { email }],
-    //   })
-    //   .lean();
+    const user = await this.dataSource.query(
+      `
+    SELECT
+        u.id,
+        u.login,
+        u.password,
+        u.email,
+        u.created_at,
+        rc.is_confirmed AS recovery_is_confirmed,
+        rc.confirmation_code AS recovery_confirmation_code,
+        rc.expiration_date AS recovery_expiration_date,
+        ec.is_confirmed AS email_is_confirmed,
+        ec.confirmation_code AS email_confirmation_code,
+        ec.expiration_date AS email_expiration_date
+    FROM
+        users u
+    LEFT JOIN
+        email_confirmations ec ON u.id = ec.user_id
+    LEFT JOIN
+        recovery_codes rc ON u.id = rc.user_id
+     WHERE u.login = $1 OR u.email = $2
+    `,
+      [
+        login, //$1
+        email, //$2
+      ],
+    );
 
-    const user = null;
-
-    if (!user) {
+    if (!Boolean(user.length)) {
       return { user: null, foundBy: null };
     }
 
-    //@ts-ignore
-    const foundBy = user?.login === login ? 'login' : 'email';
+    const foundBy = user.at(0)?.login === login ? 'login' : 'email';
     return { user, foundBy };
   }
 

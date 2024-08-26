@@ -3,8 +3,8 @@ import { UsersRepository } from '@features/users/infrastructure/users.repository
 import { BadRequestException } from '@nestjs/common';
 import { add, getCurrentISOStringDate } from '@utils/dates';
 import { getUniqueId } from '@utils/utils';
-import { User } from '@features/users/domain/user-mongo.entity';
 import { SharedService } from '@infrastructure/servises/shared/shared.service';
+import { User } from '@features/users/domain/user-mongo.entity';
 
 export class RegistrationCommand {
   constructor(
