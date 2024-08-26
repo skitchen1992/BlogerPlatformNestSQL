@@ -13,7 +13,7 @@ export class EmailConfirmation {
   id?: number;
 
   @Column({ type: 'uuid' })
-  user_id: string;
+  user_id?: string;
 
   @Column({ type: 'boolean', default: false })
   is_confirmed: boolean;

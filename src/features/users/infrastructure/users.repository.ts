@@ -50,9 +50,9 @@ export class UsersRepository {
     `,
           [
             userId,
-            emailConfirmation.isConfirmed,
-            emailConfirmation.confirmationCode,
-            emailConfirmation.expirationDate,
+            emailConfirmation.is_confirmed,
+            emailConfirmation.confirmation_code,
+            emailConfirmation.expiration_date,
           ],
         );
       }

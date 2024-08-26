@@ -16,19 +16,25 @@ export class SessionsRepository {
     @InjectDataSource() private dataSource: DataSource,
   ) {}
 
-  public async getSessionByDeviceId(
-    deviceId: string,
-  ): Promise<SessionDocument | null> {
+  public async getSessionByDeviceId(deviceId: string): Promise<Session | null> {
     try {
-      const devise = await this.sessionModel
-        .findOne({ deviceId: deviceId })
-        .lean();
+      // const devise = await this.sessionModel
+      //   .findOne({ deviceId: deviceId })
+      //   .lean();
 
-      if (!devise) {
+      const devise = await this.dataSource.query(
+        `
+      SELECT * FROM sessions s
+      WHERE s.device_id = $1
+    `,
+        [deviceId],
+      );
+
+      if (!devise.at(0)) {
         return null;
       }
 
-      return devise;
+      return devise.at(0);
     } catch (e) {
       return null;
     }

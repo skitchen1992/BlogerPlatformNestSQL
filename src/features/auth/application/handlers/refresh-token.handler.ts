@@ -49,11 +49,11 @@ export class RefreshTokenHandler
 
     const device = await this.sessionsRepository.getSessionByDeviceId(deviceId);
 
-    if (!device?.tokenExpirationDate) {
+    if (!device?.token_expiration_date) {
       throw new UnauthorizedException();
     }
 
-    if (device.tokenExpirationDate !== fromUnixTimeToISO(exp)) {
+    if (device.token_expiration_date.toISOString() !== fromUnixTimeToISO(exp)) {
       throw new UnauthorizedException();
     }
 

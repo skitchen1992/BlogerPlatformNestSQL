@@ -41,11 +41,13 @@ export class LogoutHandler implements ICommandHandler<LogoutCommand, void> {
       deviceId,
     );
 
-    if (!session?.tokenExpirationDate) {
+    if (!session?.token_expiration_date) {
       throw new UnauthorizedException();
     }
 
-    if (session.tokenExpirationDate !== fromUnixTimeToISO(exp)) {
+    if (
+      session.token_expiration_date.toISOString() !== fromUnixTimeToISO(exp)
+    ) {
       throw new UnauthorizedException();
     }
 
