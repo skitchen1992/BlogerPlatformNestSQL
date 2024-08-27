@@ -23,8 +23,8 @@ export class RegistrationConfirmationHandler
         key: 'code',
       });
     }
-
-    if (user.emailConfirmation?.isConfirmed) {
+    console.log('user', user);
+    if (user.email_is_confirmed) {
       throw new BadRequestException({
         message: 'Email already confirmed',
         key: 'code',
@@ -32,10 +32,10 @@ export class RegistrationConfirmationHandler
     }
 
     if (
-      user.emailConfirmation?.expirationDate &&
+      user.email_expiration_date &&
       isExpiredDate({
         currentDate: getCurrentISOStringDate(),
-        expirationDate: user.emailConfirmation.expirationDate.toString(),
+        expirationDate: user.email_expiration_date.toString(),
       })
     ) {
       throw new BadRequestException({
@@ -44,10 +44,6 @@ export class RegistrationConfirmationHandler
       });
     }
 
-    await this.usersRepository.updateUserFieldById(
-      user._id.toString(),
-      'emailConfirmation.isConfirmed',
-      true,
-    );
+    await this.usersRepository.toggleIsEmailConfirmed(user.id!, true);
   }
 }

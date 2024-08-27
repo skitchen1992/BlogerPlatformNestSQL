@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { User } from '@features/users/domain/user.entity';
-import { UserDocument } from '@features/users/domain/user-mongo.entity';
 import { EmailConfirmation } from '@features/users/domain/emailConfirmation.entity';
 import { RecoveryCodeDto } from '@features/auth/api/dto/recovery-code.dto';
 import { UserDetails } from '@features/users/api/dto/UserDetais';
@@ -164,18 +163,21 @@ export class UsersRepository {
     }
   }
 
-  public async updateUserFieldById(
-    id: string,
-    field: string,
-    data: unknown,
+  public async toggleIsEmailConfirmed(
+    userId: string,
+    isConfirmed: boolean,
   ): Promise<boolean> {
     try {
-      // const updateResult = await this.userModel.updateOne(
-      //   { _id: id },
-      //   { $set: { [field]: data } },
-      // );
+      const updateResult = await this.dataSource.query(
+        `
+      UPDATE email_confirmations
+      SET is_confirmed = $2
+      WHERE user_id = $1
+      `,
+        [userId, isConfirmed],
+      );
 
-      return false;
+      return Boolean(updateResult.at(1));
     } catch (e) {
       return false;
     }
@@ -209,7 +211,7 @@ export class UsersRepository {
     login: string,
     email: string,
   ): Promise<{
-    user: User | null;
+    user: UserDetails | null;
     foundBy: string | null;
   }> {
     const user = await this.dataSource.query(
@@ -248,19 +250,38 @@ export class UsersRepository {
   }
 
   public async getUserByConfirmationCode(
-    code: string,
-  ): Promise<UserDocument | null> {
-    // const user = await this.userModel
-    //   .findOne({
-    //     'emailConfirmation.confirmationCode': code,
-    //   })
-    //   .lean();
-    const user = null;
+    confirmationCode: string,
+  ): Promise<UserDetails | null> {
+    const user = await this.dataSource.query(
+      `
+    SELECT
+        u.id,
+        u.login,
+        u.password,
+        u.email,
+        u.created_at,
+        rc.is_confirmed AS recovery_is_confirmed,
+        rc.confirmation_code AS recovery_confirmation_code,
+        ec.is_confirmed AS email_is_confirmed,
+        ec.confirmation_code AS email_confirmation_code,
+        ec.expiration_date AS email_expiration_date
+    FROM
+        users u
+    LEFT JOIN
+        email_confirmations ec ON u.id = ec.user_id
+    LEFT JOIN
+        recovery_code rc ON u.id = rc.user_id
+     WHERE ec.confirmation_code = $1 
+    `,
+      [
+        confirmationCode, //$1
+      ],
+    );
 
     if (!user) {
       return null;
     }
 
-    return user;
+    return user.at(0);
   }
 }

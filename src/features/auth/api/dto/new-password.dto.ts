@@ -1,22 +1,5 @@
-export class NewPasswordDto {
-  password: string;
-  recoveryCode: {
-    isUsed: boolean;
-  };
-
-  constructor() {
-    this.recoveryCode = {
-      isUsed: true,
-    };
-  }
-}
+export class NewPasswordDto {}
 
 // MAPPERS
 
-export const NewPasswordDtoMapper = (password: string): NewPasswordDto => {
-  const outputDto = new NewPasswordDto();
-
-  outputDto.password = password;
-
-  return outputDto;
-};
+export const NewPasswordDtoMapper = (password: string): void => {};

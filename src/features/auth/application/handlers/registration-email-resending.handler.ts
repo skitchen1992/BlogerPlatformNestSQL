@@ -31,7 +31,7 @@ export class RegistrationEmailResendingHandler
         key: 'email',
       });
     }
-
+    //@ts-ignore
     if (user.emailConfirmation?.is_confirmed) {
       throw new BadRequestException({
         message: 'Email already confirmed',
@@ -40,8 +40,10 @@ export class RegistrationEmailResendingHandler
     }
 
     if (
+      //@ts-ignore
       user.emailConfirmation?.expiration_date &&
       isExpiredDate({
+        //@ts-ignore
         expirationDate: user.emailConfirmation.expiration_date.toString(),
         currentDate: getCurrentISOStringDate(),
       })
@@ -54,7 +56,8 @@ export class RegistrationEmailResendingHandler
 
     const confirmationCode = getUniqueId();
 
-    await this.usersRepository.updateUserFieldById(
+    //@ts-ignore
+    await this.usersRepository.toggleIsConfirmed(
       //@ts-ignore
       user._id.toString(),
       'emailConfirmation.confirmationCode',
