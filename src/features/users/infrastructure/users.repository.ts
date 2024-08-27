@@ -183,6 +183,26 @@ export class UsersRepository {
     }
   }
 
+  public async updateEmailConfirmationCode(
+    userId: string,
+    confirmationCode: string,
+  ): Promise<boolean> {
+    try {
+      const updateResult = await this.dataSource.query(
+        `
+      UPDATE email_confirmations
+      SET confirmation_code = $2
+      WHERE user_id = $1
+      `,
+        [userId, confirmationCode],
+      );
+
+      return Boolean(updateResult.at(1));
+    } catch (e) {
+      return false;
+    }
+  }
+
   public async isLoginExist(login: string): Promise<boolean> {
     const isLogin = await this.dataSource.query(
       ` 
