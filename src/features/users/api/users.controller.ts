@@ -25,7 +25,7 @@ import { SkipThrottle } from '@nestjs/throttler';
 
 @SkipThrottle()
 @ApiTags('Users')
-@Controller('sa/users')
+@Controller('users')
 @ApiSecurity('basic')
 @UseGuards(BasicAuthGuard)
 export class UsersController {

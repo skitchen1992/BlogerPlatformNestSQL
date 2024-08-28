@@ -91,16 +91,18 @@ export class UsersRepository {
 
   public async delete(userId: string): Promise<boolean> {
     try {
-      await this.dataSource.query(
+      const result = await this.dataSource.query(
         `
-        DELETE from users 
-        WHERE id = $1
-    `,
+      DELETE FROM users 
+      WHERE id = $1
+      RETURNING *;  -- To ensure you get feedback on the operation
+      `,
         [userId],
       );
 
-      return true;
+      return Boolean(result.at(1));
     } catch (e) {
+      console.error('Error during delete operation:', e);
       return false;
     }
   }
