@@ -1,9 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import {
-  SessionDocument,
-  SessionModelType,
-} from '../domain/session-mongo.entity';
+import { SessionModelType } from '../domain/session-mongo.entity';
 import { UpdateQuery } from 'mongoose';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
@@ -74,11 +71,16 @@ export class SessionsRepository {
     }
   }
 
-  public async deleteSessionByDeviceId(id: string): Promise<boolean> {
+  public async deleteSessionByDeviceId(deviceId: string): Promise<boolean> {
     try {
-      const deleteResult = await this.sessionModel.deleteOne({ deviceId: id });
-
-      return deleteResult.deletedCount === 1;
+      const result = await this.dataSource.query(
+        `
+        DELETE FROM sessions
+        WHERE device_id = $1;
+    `,
+        [deviceId],
+      );
+      return result.at(1) === 1;
     } catch (e) {
       return false;
     }

@@ -55,11 +55,11 @@ export class UsersRepository {
     try {
       const result = await this.dataSource.query(
         `
-      INSERT INTO users (login, password, email, created_at)
-      VALUES ($1, $2, $3, $4)
+      INSERT INTO users (login, password, email)
+      VALUES ($1, $2, $3)
       RETURNING id;
     `,
-        [newUser.login, newUser.password, newUser.email, new Date()],
+        [newUser.login, newUser.password, newUser.email],
       );
 
       const userId = result[0].id;

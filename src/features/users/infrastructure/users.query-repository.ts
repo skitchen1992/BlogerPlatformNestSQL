@@ -72,19 +72,19 @@ where u.id = $1
       (u.login ~* $1 OR u.email ~* $2)
     `;
       queryParams.push(`.*${searchLoginTerm}.*`, `.*${searchEmailTerm}.*`);
+    } else if (searchLoginTerm) {
+      whereConditions = `u.login ~* $1`;
+      queryParams.push(`.*${searchLoginTerm}.*`);
+    } else if (searchEmailTerm) {
+      whereConditions = `u.email ~* $1`;
+      queryParams.push(`.*${searchEmailTerm}.*`);
     } else {
-      if (searchLoginTerm) {
-        whereConditions = `u.login ~* $1`;
-        queryParams.push(`.*${searchLoginTerm}.*`);
-      }
-      if (searchEmailTerm) {
-        if (whereConditions) {
-          whereConditions += ' OR ';
-        }
-        whereConditions += `u.email ~* $1`;
-        queryParams.push(`.*${searchEmailTerm}.*`);
-      }
+      whereConditions = 'TRUE'; // No search criteria, fetch all
     }
+
+    // Добавляем COLLATE только для login и email
+    const collateClause =
+      sortField === 'login' || sortField === 'email' ? 'COLLATE "C"' : '';
 
     const users = await this.dataSource.query(
       `
@@ -106,11 +106,9 @@ where u.id = $1
     LEFT JOIN
         recovery_code rc ON u.id = rc.user_id
     WHERE
-        ${
-          whereConditions || 'TRUE'
-        }  -- Ensures WHERE clause is valid even if no search term
+        ${whereConditions}
     ORDER BY
-        ${sortField} ${direction}
+        ${sortField} ${collateClause} ${direction}
     LIMIT $${queryParams.length + 1}
     OFFSET $${queryParams.length + 2} * ($${queryParams.length + 3} - 1);
     `,
@@ -127,7 +125,7 @@ where u.id = $1
     SELECT COUNT(*)::int AS count
     FROM users u
     WHERE
-        ${whereConditions || 'TRUE'}
+        ${whereConditions}
     `,
       queryParams,
     );

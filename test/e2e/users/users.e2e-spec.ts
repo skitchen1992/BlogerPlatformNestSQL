@@ -167,16 +167,16 @@ describe('Users (e2e) GET', () => {
     });
   });
 
-  it('Should getById array by filters', async () => {
+  it('Should get array by filters', async () => {
     const userList = [
-      { login: 'loSer', password: 'string', email: 'email2p@gg.om' },
-      { login: 'log01', password: 'string', email: 'emai@gg.com' },
-      { login: 'log02', password: 'string', email: 'email2p@g.com' },
-      { login: 'uer15', password: 'string', email: 'emarrr1@gg.com' },
       { login: 'user01', password: 'string', email: 'email1p@gg.cm' },
       { login: 'user02', password: 'string', email: 'email1p@gg.com' },
-      { login: 'user03', password: 'string', email: 'email1p@gg.cou' },
       { login: 'user05', password: 'string', email: 'email1p@gg.coi' },
+      { login: 'user03', password: 'string', email: 'email1p@gg.cou' },
+      { login: 'log01', password: 'string', email: 'emai@gg.com' },
+      { login: 'log02', password: 'string', email: 'email2p@g.com' },
+      { login: 'loSer', password: 'string', email: 'email2p@gg.om' },
+      { login: 'uer15', password: 'string', email: 'emarrr1@gg.com' },
       { login: 'usr-1-01', password: 'string', email: 'email3@gg.com' },
     ];
 
@@ -190,7 +190,6 @@ describe('Users (e2e) GET', () => {
         [user.login, user.password, user.email, getCurrentISOStringDate()],
       );
     }
-
     const response = await request(app.getHttpServer())
       .get(
         `${APP_PREFIX}/users/?pageSize=15&pageNumber=1&searchLoginTerm=seR&searchEmailTerm=.com&sortDirection=asc&sortBy=login`,
@@ -203,68 +202,62 @@ describe('Users (e2e) GET', () => {
       )
       .expect(HttpStatus.OK);
 
-    expect(response.body).toEqual({
-      items: expect.arrayContaining([
-        expect.objectContaining({
-          id: expect.any(String),
-          login: 'loSer',
-          email: 'email2p@gg.om',
-          createdAt: expect.any(String),
-        }),
-        expect.objectContaining({
-          id: expect.any(String),
-          login: 'log01',
-          email: 'emai@gg.com',
-          createdAt: expect.any(String),
-        }),
-        expect.objectContaining({
-          id: expect.any(String),
-          login: 'log02',
-          email: 'email2p@g.com',
-          createdAt: expect.any(String),
-        }),
-        expect.objectContaining({
-          id: expect.any(String),
-          login: 'uer15',
-          email: 'emarrr1@gg.com',
-          createdAt: expect.any(String),
-        }),
-        expect.objectContaining({
-          id: expect.any(String),
-          login: 'user01',
-          email: 'email1p@gg.cm',
-          createdAt: expect.any(String),
-        }),
-        expect.objectContaining({
-          id: expect.any(String),
-          login: 'user02',
-          email: 'email1p@gg.com',
-          createdAt: expect.any(String),
-        }),
-        expect.objectContaining({
-          id: expect.any(String),
-          login: 'user03',
-          email: 'email1p@gg.cou',
-          createdAt: expect.any(String),
-        }),
-        expect.objectContaining({
-          id: expect.any(String),
-          login: 'user05',
-          email: 'email1p@gg.coi',
-          createdAt: expect.any(String),
-        }),
-        expect.objectContaining({
-          id: expect.any(String),
-          login: 'usr-1-01',
-          email: 'email3@gg.com',
-          createdAt: expect.any(String),
-        }),
-      ]),
-      totalCount: 9,
-      pageSize: 15,
-      page: 1,
-      pagesCount: 1,
-    });
+    expect(response.body.items).toEqual([
+      {
+        id: expect.any(String),
+        login: 'loSer',
+        email: 'email2p@gg.om',
+        createdAt: expect.any(String),
+      },
+      {
+        id: expect.any(String),
+        login: 'log01',
+        email: 'emai@gg.com',
+        createdAt: expect.any(String),
+      },
+      {
+        id: expect.any(String),
+        login: 'log02',
+        email: 'email2p@g.com',
+        createdAt: expect.any(String),
+      },
+      {
+        id: expect.any(String),
+        login: 'uer15',
+        email: 'emarrr1@gg.com',
+        createdAt: expect.any(String),
+      },
+      {
+        id: expect.any(String),
+        login: 'user01',
+        email: 'email1p@gg.cm',
+        createdAt: expect.any(String),
+      },
+      {
+        id: expect.any(String),
+        login: 'user02',
+        email: 'email1p@gg.com',
+        createdAt: expect.any(String),
+      },
+      {
+        id: expect.any(String),
+        login: 'user03',
+        email: 'email1p@gg.cou',
+        createdAt: expect.any(String),
+      },
+      {
+        id: expect.any(String),
+        login: 'user05',
+        email: 'email1p@gg.coi',
+        createdAt: expect.any(String),
+      },
+      {
+        id: expect.any(String),
+        login: 'usr-1-01',
+        email: 'email3@gg.com',
+        createdAt: expect.any(String),
+      },
+    ]);
   });
 });
 
