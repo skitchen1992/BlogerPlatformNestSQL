@@ -7,6 +7,6 @@ export class UserDetails {
   recovery_is_confirmed: boolean;
   recovery_confirmation_code: string;
   email_is_confirmed: boolean;
-  email_confirmation_code: Date;
+  email_confirmation_code: string;
   email_expiration_date: Date;
 }

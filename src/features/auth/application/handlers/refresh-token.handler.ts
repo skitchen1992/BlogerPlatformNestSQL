@@ -4,7 +4,7 @@ import { CookieService } from '@infrastructure/servises/cookie/cookie.service';
 import { COOKIE_KEY } from '@utils/consts';
 import { Request, Response } from 'express';
 import { SessionsRepository } from '@features/session/infrastructure/sessions.repository';
-import { fromUnixTimeToISO, getCurrentISOStringDate } from '@utils/dates';
+import { fromUnixTimeToISO } from '@utils/dates';
 import { SharedService } from '@infrastructure/servises/shared/shared.service';
 import { ConfigService } from '@nestjs/config';
 import { ConfigurationType } from '@settings/configuration';
@@ -67,11 +67,11 @@ export class RefreshTokenHandler
       { expiresIn: apiSettings.REFRESH_TOKEN_EXPIRED_IN },
     );
 
-    await this.sessionsRepository.updateByDeviceId(deviceId, {
-      tokenExpirationDate:
-        this.sharedService.getTokenExpirationDate(newRefreshToken),
-      lastActiveDate: getCurrentISOStringDate(),
-    });
+    await this.sessionsRepository.updateDatesByDeviceId(
+      deviceId,
+      this.sharedService.getTokenExpirationDate(newRefreshToken)!,
+      new Date(),
+    );
 
     this.cookieService.setCookie(
       res,

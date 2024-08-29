@@ -111,17 +111,24 @@ export class SessionsRepository {
     }
   }
 
-  public async updateByDeviceId(
+  public async updateDatesByDeviceId(
     deviceId: string,
-    data: UpdateQuery<Session>,
+    tokenExpirationDate: Date,
+    lastActiveDate: Date,
   ): Promise<boolean> {
     try {
-      const updatedResult = await this.sessionModel.updateOne(
-        { deviceId: deviceId },
-        data,
+      const updateResult = await this.dataSource.query(
+        `
+      UPDATE sessions
+      SET token_expiration_date = $1, 
+            last_active_date = $2
+      WHERE device_id = $3
+      RETURNING id;
+      `,
+        [tokenExpirationDate, lastActiveDate, deviceId],
       );
 
-      return updatedResult.matchedCount > 0;
+      return Boolean(updateResult.at(1));
     } catch (e) {
       return false;
     }

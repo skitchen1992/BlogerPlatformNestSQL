@@ -13,7 +13,7 @@ export class DeleteUserHandler
   constructor(private readonly usersRepository: UsersRepository) {}
   async execute(command: DeleteUserCommand) {
     const { userId } = command;
-    console.log('delete');
+
     const isDeleted: boolean = await this.usersRepository.delete(userId);
 
     if (!isDeleted) {
