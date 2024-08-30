@@ -1,6 +1,6 @@
 export class SessionDetails {
   id: number;
-  userId: string;
+  user_id: string;
   ip: string;
   title: string;
   last_active_date: Date;

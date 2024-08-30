@@ -5,6 +5,7 @@ import { UpdateQuery } from 'mongoose';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { Session } from '@features/session/domain/session.entity';
+import { SessionDetails } from '@features/session/api/dto/SessionDetais';
 
 @Injectable()
 export class SessionsRepository {
@@ -13,7 +14,9 @@ export class SessionsRepository {
     @InjectDataSource() private dataSource: DataSource,
   ) {}
 
-  public async getSessionByDeviceId(deviceId: string): Promise<Session | null> {
+  public async getSessionByDeviceId(
+    deviceId: string,
+  ): Promise<SessionDetails | null> {
     try {
       const devise = await this.dataSource.query(
         `
@@ -86,10 +89,19 @@ export class SessionsRepository {
     }
   }
 
-  async deleteList(): Promise<boolean> {
+  async deleteSessionListByUserId(userId: string): Promise<boolean> {
     try {
-      const deleteResult = await this.sessionModel.deleteMany({});
-      return deleteResult.deletedCount === 1;
+      const deleteResult = await this.dataSource.query(
+        `
+  DELETE FROM sessions
+  WHERE user_id = $1
+  `,
+        [userId],
+      );
+
+      console.log('deleteResult', deleteResult);
+
+      return Boolean(deleteResult.at(1));
     } catch (e) {
       return false;
     }

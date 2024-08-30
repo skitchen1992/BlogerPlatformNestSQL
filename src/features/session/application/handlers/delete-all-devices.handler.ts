@@ -48,7 +48,7 @@ export class DeleteAllDevicesHandler
       throw new UnauthorizedException();
     }
 
-    await this.sessionsRepository.deleteList();
+    await this.sessionsRepository.deleteSessionListByUserId(session.user_id);
 
     const newSession: Session = {
       user_id: session.user_id,
