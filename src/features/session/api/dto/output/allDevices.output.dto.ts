@@ -1,4 +1,5 @@
 import { SessionDocument } from '@features/session/domain/session-mongo.entity';
+import { SessionDetails } from '@features/session/api/dto/SessionDetais';
 
 export class AllDevicesOutputDto {
   ip: string;
@@ -10,14 +11,14 @@ export class AllDevicesOutputDto {
 // MAPPERS
 
 export const AllDevicesOutputDtoMapper = (
-  session: SessionDocument,
+  session: SessionDetails,
 ): AllDevicesOutputDto => {
   const outputDto = new AllDevicesOutputDto();
 
   outputDto.ip = session.ip;
   outputDto.title = session.title;
-  outputDto.lastActiveDate = session.lastActiveDate;
-  outputDto.deviceId = session.deviceId;
+  outputDto.lastActiveDate = session.last_active_date.toISOString();
+  outputDto.deviceId = session.device_id;
 
   return outputDto;
 };
