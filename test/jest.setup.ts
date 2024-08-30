@@ -10,6 +10,7 @@ import { HashBuilder } from '@utils/hash-builder';
 //import { SharedService } from '@infrastructure/servises/shared/shared.service';
 import { JwtService } from '@nestjs/jwt/dist/jwt.service';
 import { DataSource } from 'typeorm';
+import { SharedService } from '@infrastructure/servises/shared/shared.service';
 
 export let app: INestApplication;
 export let dataSource: DataSource;
@@ -19,29 +20,29 @@ export let environmentSettings: EnvironmentSettings;
 export const hashBuilder = new HashBuilder();
 export const jwtService = new JwtService();
 
-//let sharedService: SharedService;
+let sharedService: SharedService;
 
 beforeAll(async () => {
   const moduleFixture: TestingModule = await Test.createTestingModule({
     imports: [AppModule],
   }).compile();
 
-  // jest
-  //   .spyOn(sharedService, 'sendRegisterEmail')
-  //   .mockImplementation(async () => {
-  //     return Promise.resolve();
-  //   });
-  //
-  // jest
-  //   .spyOn(sharedService, 'sendRecoveryPassEmail')
-  //   .mockImplementation(async () => {
-  //     return Promise.resolve();
-  //   });
+  sharedService = moduleFixture.get<SharedService>(SharedService);
+
+  jest
+    .spyOn(sharedService, 'sendRegisterEmail')
+    .mockImplementation(async () => {
+      return Promise.resolve();
+    });
+
+  jest
+    .spyOn(sharedService, 'sendRecoveryPassEmail')
+    .mockImplementation(async () => {
+      return Promise.resolve();
+    });
 
   app = moduleFixture.createNestApplication();
   dataSource = moduleFixture.get<DataSource>(DataSource);
-
-  //sharedService = moduleFixture.get<SharedService>(SharedService);
 
   const configService = app.get(ConfigService<ConfigurationType, true>);
 
