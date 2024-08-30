@@ -1,4 +1,3 @@
-import { SessionDocument } from '@features/session/domain/session-mongo.entity';
 import { SessionDetails } from '@features/session/api/dto/SessionDetais';
 
 export class AllDevicesOutputDto {
