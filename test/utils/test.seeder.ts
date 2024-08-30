@@ -1,7 +1,6 @@
 import { add, getCurrentISOStringDate } from '@utils/dates';
 import { getUniqueId } from '@utils/utils';
 import { Blog } from '@features/blogs/domain/blog.entity';
-import { User } from '@features/users/domain/user.entity';
 import { Post } from '@features/posts/domain/post.entity';
 import { ObjectId } from 'mongodb';
 import { Comment } from '@features/comments/domain/comment.entity';
@@ -10,38 +9,42 @@ import {
   LikeStatusEnum,
   ParentTypeEnum,
 } from '@features/likes/domain/likes.entity';
+import { User } from '@features/users/domain/user.entity';
 
 export const testSeeder = {
   createUserDto(): User {
     return {
+      id: '',
       login: 'test',
       email: 'test@gmail.com',
       password: '123456789',
-      createdAt: getCurrentISOStringDate(),
+      created_at: getCurrentISOStringDate(),
     };
   },
 
   createUserDtoHashPass(hashPass: string): User {
     return {
+      id: '',
       login: 'test',
       email: 'test@gmail.com',
       password: hashPass,
-      createdAt: getCurrentISOStringDate(),
+      created_at: getCurrentISOStringDate(),
     };
   },
 
   createUserListDto(count: number, pass?: string): User[] {
     return new Array(count).fill(null).map((item, index) => {
       return {
+        id: '',
         login: `test${index}`,
         email: `test${index}@gmail.com`,
         password: pass || `123456789${index}`,
-        createdAt: getCurrentISOStringDate(),
-        emailConfirmation: {
-          confirmationCode: getUniqueId(),
-          expirationDate: add(getCurrentISOStringDate(), { hours: 1 }),
-          isConfirmed: true,
-        },
+        created_at: getCurrentISOStringDate(),
+        // emailConfirmation: {
+        //   confirmationCode: getUniqueId(),
+        //   expirationDate: add(getCurrentISOStringDate(), { hours: 1 }),
+        //   isConfirmed: true,
+        // },
       };
     });
   },

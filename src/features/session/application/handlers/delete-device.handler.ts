@@ -57,7 +57,7 @@ export class DeleteDeviceHandler
       throw new NotFoundException(`Device with id ${deviceId} not found`);
     }
 
-    if (session.userId !== userId) {
+    if (session.user_id !== userId) {
       throw new ForbiddenException();
     }
 

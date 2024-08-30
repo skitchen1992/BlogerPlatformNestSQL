@@ -32,7 +32,7 @@ export class RegistrationEmailResendingHandler
       });
     }
 
-    if (user.emailConfirmation?.isConfirmed) {
+    if (user.email_is_confirmed) {
       throw new BadRequestException({
         message: 'Email already confirmed',
         key: 'email',
@@ -40,9 +40,9 @@ export class RegistrationEmailResendingHandler
     }
 
     if (
-      user.emailConfirmation?.expirationDate &&
+      user.email_expiration_date &&
       isExpiredDate({
-        expirationDate: user.emailConfirmation.expirationDate.toString(),
+        expirationDate: user.email_expiration_date.toString(),
         currentDate: getCurrentISOStringDate(),
       })
     ) {
@@ -54,9 +54,8 @@ export class RegistrationEmailResendingHandler
 
     const confirmationCode = getUniqueId();
 
-    await this.usersRepository.updateUserFieldById(
-      user._id.toString(),
-      'emailConfirmation.confirmationCode',
+    await this.usersRepository.updateEmailConfirmationCode(
+      user.id,
       confirmationCode,
     );
 

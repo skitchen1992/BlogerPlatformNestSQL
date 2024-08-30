@@ -32,11 +32,11 @@ export class PasswordRecoveryHandler
       return;
     }
 
-    const userId = user._id.toString();
+    const userId = user.id!;
 
     const recoveryAccessToken = await this.sharedService.getAccessToken(userId);
 
-    await this.usersRepository.update(
+    await this.usersRepository.insertRecoveryCode(
       userId,
       RecoveryCodeDtoMapper(recoveryAccessToken),
     );

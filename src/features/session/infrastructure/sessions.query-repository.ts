@@ -1,23 +1,23 @@
 import { Injectable } from '@nestjs/common';
-import { Session, SessionModelType } from '../domain/session.entity';
-import { InjectModel } from '@nestjs/mongoose';
-import { getCurrentISOStringDate } from '@utils/dates';
 import { AllDevicesOutputDtoMapper } from '@features/session/api/dto/output/allDevices.output.dto';
+import { InjectDataSource } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
+import { SessionDetails } from '@features/session/api/dto/SessionDetais';
 
 @Injectable()
 export class SessionsQueryRepository {
-  constructor(
-    @InjectModel(Session.name) private sessionModel: SessionModelType,
-  ) {}
+  constructor(@InjectDataSource() private dataSource: DataSource) {}
 
   async getDeviceListByUserId(userId: string) {
-    const filters = {
-      userId,
-      tokenExpirationDate: { $gt: getCurrentISOStringDate() },
-    };
+    const sessions: SessionDetails[] = await this.dataSource.query(
+      `
+      SELECT * FROM sessions s
+      WHERE s.user_id = $1
+            AND s.token_expiration_date > $2
+    `,
+      [userId, new Date()],
+    );
 
-    const sessionList = await this.sessionModel.find(filters).lean();
-
-    return sessionList.map((session) => AllDevicesOutputDtoMapper(session));
+    return sessions.map((session) => AllDevicesOutputDtoMapper(session));
   }
 }

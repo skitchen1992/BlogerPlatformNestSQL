@@ -1,6 +1,6 @@
 import request from 'supertest';
 import { testSeeder } from '../../utils/test.seeder';
-import { app, hashBuilder, mockUserModel } from '../../jest.setup';
+import { app, dataSource, hashBuilder } from '../../jest.setup';
 import { APP_PREFIX } from '@settings/apply-app-setting';
 import { HttpStatus } from '@nestjs/common';
 import { ID } from '../../mocks/mocks';
@@ -9,11 +9,18 @@ describe(`Endpoint (GET) - /devices`, () => {
   it('Should get 2 devices', async () => {
     const password = 'password';
 
-    const userList = await mockUserModel.insertMany(
-      testSeeder.createUserDtoHashPass(await hashBuilder.hash(password)),
+    const user = testSeeder.createUserDtoHashPass(
+      await hashBuilder.hash(password),
     );
 
-    const user = userList[0];
+    await dataSource.query(
+      `
+      INSERT INTO users (login, password, email, created_at)
+      VALUES ($1, $2, $3, $4)
+      RETURNING id;
+    `,
+      [user.login, user.password, user.email, user.created_at],
+    );
 
     await request(app.getHttpServer())
       .post(`${APP_PREFIX}/auth/login`)
@@ -52,11 +59,18 @@ describe(`Endpoint (DELETE) - /devices`, () => {
   it('Should get 0 devices', async () => {
     const password = 'password';
 
-    const userList = await mockUserModel.insertMany(
-      testSeeder.createUserDtoHashPass(await hashBuilder.hash(password)),
+    const user = testSeeder.createUserDtoHashPass(
+      await hashBuilder.hash(password),
     );
 
-    const user = userList[0];
+    await dataSource.query(
+      `
+      INSERT INTO users (login, password, email, created_at)
+      VALUES ($1, $2, $3, $4)
+      RETURNING id;
+    `,
+      [user.login, user.password, user.email, user.created_at],
+    );
 
     await request(app.getHttpServer())
       .post(`${APP_PREFIX}/auth/login`)
@@ -93,11 +107,18 @@ describe(`Endpoint (DELETE) - /devices/:deviceId`, () => {
   it(`Should get 0 devices ${HttpStatus.NO_CONTENT}`, async () => {
     const password = 'password';
 
-    const userList = await mockUserModel.insertMany(
-      testSeeder.createUserDtoHashPass(await hashBuilder.hash(password)),
+    const user = testSeeder.createUserDtoHashPass(
+      await hashBuilder.hash(password),
     );
 
-    const user = userList[0];
+    await dataSource.query(
+      `
+      INSERT INTO users (login, password, email, created_at)
+      VALUES ($1, $2, $3, $4)
+      RETURNING id;
+    `,
+      [user.login, user.password, user.email, user.created_at],
+    );
 
     await request(app.getHttpServer())
       .post(`${APP_PREFIX}/auth/login`)
@@ -137,9 +158,21 @@ describe(`Endpoint (DELETE) - /devices/:deviceId`, () => {
   it(`Should get status ${HttpStatus.FORBIDDEN}`, async () => {
     const password = 'password';
 
-    const userList = await mockUserModel.insertMany(
-      testSeeder.createUserListDto(3, await hashBuilder.hash(password)),
+    const userList = testSeeder.createUserListDto(
+      2,
+      await hashBuilder.hash(password),
     );
+
+    for (const user of userList) {
+      await dataSource.query(
+        `
+      INSERT INTO users (login, password, email, created_at)
+      VALUES ($1, $2, $3, $4)
+      RETURNING id;
+    `,
+        [user.login, user.password, user.email, user.created_at],
+      );
+    }
 
     const res1 = await request(app.getHttpServer())
       .post(`${APP_PREFIX}/auth/login`)
@@ -180,11 +213,18 @@ describe(`Endpoint (DELETE) - /devices/:deviceId`, () => {
   it(`Should get status ${HttpStatus.NOT_FOUND}`, async () => {
     const password = 'password';
 
-    const userList = await mockUserModel.insertMany(
-      testSeeder.createUserListDto(3, await hashBuilder.hash(password)),
+    const user = testSeeder.createUserDtoHashPass(
+      await hashBuilder.hash(password),
     );
 
-    const user = userList[0];
+    await dataSource.query(
+      `
+      INSERT INTO users (login, password, email, created_at)
+      VALUES ($1, $2, $3, $4)
+      RETURNING id;
+    `,
+      [user.login, user.password, user.email, user.created_at],
+    );
 
     await request(app.getHttpServer())
       .post(`${APP_PREFIX}/auth/login`)

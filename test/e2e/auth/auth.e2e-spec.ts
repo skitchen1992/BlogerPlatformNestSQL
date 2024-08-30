@@ -1,5 +1,11 @@
 import { createAuthorizationHeader } from '../../utils/test-helpers';
-import { apiSettings, app, jwtService, mockUserModel } from '../../jest.setup';
+import {
+  apiSettings,
+  app,
+  dataSource,
+  hashBuilder,
+  jwtService,
+} from '../../jest.setup';
 import { HttpStatus } from '@nestjs/common';
 import request from 'supertest';
 import { APP_PREFIX } from '@settings/apply-app-setting';
@@ -7,20 +13,20 @@ import { testSeeder } from '../../utils/test.seeder';
 
 describe(`Endpoint (POST) - /login`, () => {
   it(`Should get status ${HttpStatus.NO_CONTENT}`, async () => {
-    await request(app.getHttpServer())
-      .post(`${APP_PREFIX}/users`)
-      .set(
-        createAuthorizationHeader(
-          apiSettings.ADMIN_AUTH_USERNAME,
-          apiSettings.ADMIN_AUTH_PASSWORD,
-        ),
-      )
-      .send({
-        login: 'login',
-        password: 'password',
-        email: 'example@example.com',
-      })
-      .expect(HttpStatus.CREATED);
+    const password = 'password';
+
+    const user = testSeeder.createUserDtoHashPass(
+      await hashBuilder.hash(password),
+    );
+
+    await dataSource.query(
+      `
+      INSERT INTO users (login, password, email, created_at)
+      VALUES ($1, $2, $3, $4)
+      RETURNING id;
+    `,
+      [user.login, user.password, user.email, user.created_at],
+    );
 
     await request(app.getHttpServer())
       .post(`${APP_PREFIX}/auth/login`)
@@ -31,27 +37,27 @@ describe(`Endpoint (POST) - /login`, () => {
         ),
       )
       .send({
-        loginOrEmail: 'login',
-        password: 'password',
+        loginOrEmail: user.login,
+        password,
       })
       .expect(HttpStatus.OK);
   });
 
   it(`Should get status ${HttpStatus.UNAUTHORIZED}`, async () => {
-    await request(app.getHttpServer())
-      .post(`${APP_PREFIX}/users`)
-      .set(
-        createAuthorizationHeader(
-          apiSettings.ADMIN_AUTH_USERNAME,
-          apiSettings.ADMIN_AUTH_PASSWORD,
-        ),
-      )
-      .send({
-        login: 'login',
-        password: 'password',
-        email: 'example@example.com',
-      })
-      .expect(HttpStatus.CREATED);
+    const password = 'password';
+
+    const user = testSeeder.createUserDtoHashPass(
+      await hashBuilder.hash(password),
+    );
+
+    await dataSource.query(
+      `
+      INSERT INTO users (login, password, email, created_at)
+      VALUES ($1, $2, $3, $4)
+      RETURNING id;
+    `,
+      [user.login, user.password, user.email, user.created_at],
+    );
 
     await request(app.getHttpServer())
       .post(`${APP_PREFIX}/auth/login`)
@@ -63,7 +69,7 @@ describe(`Endpoint (POST) - /login`, () => {
       )
       .send({
         loginOrEmail: 'logi',
-        password: 'password',
+        password,
       })
       .expect(HttpStatus.UNAUTHORIZED);
   });
@@ -99,15 +105,16 @@ describe(`Endpoint (POST) - /registration`, () => {
   });
 
   it(`Should get status ${HttpStatus.BAD_REQUEST}`, async () => {
-    // const data = testSeeder.createUserDto();
-    //
-    // await userService.createUser(data);
+    const user = testSeeder.createUserDto();
 
-    const userList = await mockUserModel.insertMany(
-      testSeeder.createUserListDto(3),
+    await dataSource.query(
+      `
+      INSERT INTO users (login, password, email, created_at)
+      VALUES ($1, $2, $3, $4)
+      RETURNING id;
+    `,
+      [user.login, user.password, user.email, user.created_at],
     );
-
-    const user = userList[0];
 
     const res = await request(app.getHttpServer())
       .post(`${APP_PREFIX}/auth/registration`)
@@ -131,11 +138,16 @@ describe(`Endpoint (POST) - /registration`, () => {
 
 describe(`Endpoint (POST) - /password-recovery`, () => {
   it(`Should get status ${HttpStatus.NO_CONTENT}`, async () => {
-    const userList = await mockUserModel.insertMany(
-      testSeeder.createUserListDto(3),
-    );
+    const user = testSeeder.createUserDto();
 
-    const user = userList[0];
+    await dataSource.query(
+      `
+      INSERT INTO users (login, password, email, created_at)
+      VALUES ($1, $2, $3, $4)
+      RETURNING id;
+    `,
+      [user.login, user.password, user.email, user.created_at],
+    );
 
     await request(app.getHttpServer())
       .post(`${APP_PREFIX}/auth/password-recovery`)
@@ -146,7 +158,16 @@ describe(`Endpoint (POST) - /password-recovery`, () => {
   });
 
   it(`Should get status ${HttpStatus.BAD_REQUEST}`, async () => {
-    await mockUserModel.insertMany(testSeeder.createUserListDto(3));
+    const user = testSeeder.createUserDto();
+
+    await dataSource.query(
+      `
+      INSERT INTO users (login, password, email, created_at)
+      VALUES ($1, $2, $3, $4)
+      RETURNING id;
+    `,
+      [user.login, user.password, user.email, user.created_at],
+    );
 
     const res = await request(app.getHttpServer())
       .post(`${APP_PREFIX}/auth/password-recovery`)
@@ -168,62 +189,74 @@ describe(`Endpoint (POST) - /password-recovery`, () => {
 
 describe(`Endpoint (POST) - /new-password`, () => {
   it(`Should get status`, async () => {
-    const userList = await mockUserModel.insertMany(
-      testSeeder.createUserListDto(3),
+    const user = testSeeder.createUserDto();
+
+    const userList = await dataSource.query(
+      `
+      INSERT INTO users (login, password, email, created_at)
+      VALUES ($1, $2, $3, $4)
+      RETURNING id;
+    `,
+      [user.login, user.password, user.email, user.created_at],
     );
 
-    const user = userList[0];
+    const userId = userList.at(0).id;
 
-    const recoveryPassToken = await jwtService.signAsync(
-      { userId: user?._id.toString() },
+    const confirmationCode = await jwtService.signAsync(
+      { userId },
       { expiresIn: '1d', secret: apiSettings.JWT_SECRET_KEY },
     );
 
-    await mockUserModel.updateOne(
-      { _id: user!._id.toString() },
-      {
-        recoveryCode: {
-          code: recoveryPassToken,
-          isUsed: false,
-        },
-      },
+    await dataSource.query(
+      `
+      INSERT INTO recovery_code (user_id, confirmation_code, is_confirmed)
+      VALUES ($1, $2, $3)
+      RETURNING id;
+      `,
+      [userId, confirmationCode, false],
     );
 
     await request(app.getHttpServer())
       .post(`${APP_PREFIX}/auth/new-password`)
       .send({
-        recoveryCode: recoveryPassToken,
+        recoveryCode: confirmationCode,
         newPassword: 'password1',
       })
       .expect(HttpStatus.NO_CONTENT);
   });
 
   it(`Should get status ${HttpStatus.BAD_REQUEST} if userId=null `, async () => {
-    const userList = await mockUserModel.insertMany(
-      testSeeder.createUserListDto(3),
+    const user = testSeeder.createUserDto();
+
+    const userList = await dataSource.query(
+      `
+      INSERT INTO users (login, password, email, created_at)
+      VALUES ($1, $2, $3, $4)
+      RETURNING id;
+    `,
+      [user.login, user.password, user.email, user.created_at],
     );
 
-    const user = userList[0];
+    const userId = userList.at(0).id;
 
-    const recoveryPassToken = await jwtService.signAsync(
+    const confirmationCode = await jwtService.signAsync(
       { userId: null },
       { expiresIn: '1d', secret: apiSettings.JWT_SECRET_KEY },
     );
 
-    await mockUserModel.updateOne(
-      { _id: user!._id.toString() },
-      {
-        recoveryCode: {
-          code: recoveryPassToken,
-          isUsed: false,
-        },
-      },
+    await dataSource.query(
+      `
+      INSERT INTO recovery_code (user_id, confirmation_code, is_confirmed)
+      VALUES ($1, $2, $3)
+      RETURNING id;
+      `,
+      [userId, confirmationCode, false],
     );
 
     const res = await request(app.getHttpServer())
       .post(`${APP_PREFIX}/auth/new-password`)
       .send({
-        recoveryCode: recoveryPassToken,
+        recoveryCode: confirmationCode,
         newPassword: 'password1',
       })
       .expect(HttpStatus.BAD_REQUEST);
@@ -236,31 +269,37 @@ describe(`Endpoint (POST) - /new-password`, () => {
   });
 
   it(`Should get status ${HttpStatus.BAD_REQUEST} if token expired `, async () => {
-    const userList = await mockUserModel.insertMany(
-      testSeeder.createUserListDto(3),
+    const user = testSeeder.createUserDto();
+
+    const userList = await dataSource.query(
+      `
+      INSERT INTO users (login, password, email, created_at)
+      VALUES ($1, $2, $3, $4)
+      RETURNING id;
+    `,
+      [user.login, user.password, user.email, user.created_at],
     );
 
-    const user = userList[0];
+    const userId = userList.at(0).id;
 
-    const recoveryPassToken = await jwtService.signAsync(
+    const confirmationCode = await jwtService.signAsync(
       { userId: null },
       { expiresIn: 0, secret: apiSettings.JWT_SECRET_KEY },
     );
 
-    await mockUserModel.updateOne(
-      { _id: user!._id.toString() },
-      {
-        recoveryCode: {
-          code: recoveryPassToken,
-          isUsed: false,
-        },
-      },
+    await dataSource.query(
+      `
+      INSERT INTO recovery_code (user_id, confirmation_code, is_confirmed)
+      VALUES ($1, $2, $3)
+      RETURNING id;
+      `,
+      [userId, confirmationCode, false],
     );
 
     const res = await request(app.getHttpServer())
       .post(`${APP_PREFIX}/auth/new-password`)
       .send({
-        recoveryCode: recoveryPassToken,
+        recoveryCode: confirmationCode,
         newPassword: 'password1',
       })
       .expect(HttpStatus.BAD_REQUEST);

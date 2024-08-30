@@ -64,17 +64,17 @@ export class SharedService {
     return await this.jwtService.signAsync({ userId, deviceId }, options);
   }
 
-  getTokenExpirationDate(token: string): string {
+  getTokenExpirationDate(token: string): Date | null {
     try {
       const { exp } = (this.jwtService.verify(token) as JwtPayload) ?? {};
 
       if (!exp) {
-        return '';
+        return null;
       }
 
-      return new Date(exp * 1000).toISOString(); // конвертируем секунды в миллисекунды
+      return new Date(exp * 1000); // конвертируем секунды в миллисекунды
     } catch (e) {
-      return '';
+      return null;
     }
   }
 

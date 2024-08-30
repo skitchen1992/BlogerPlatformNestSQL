@@ -1,35 +1,42 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Model } from 'mongoose';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
+import { User } from '@features/users/domain/user.entity';
 
-@Schema()
+@Entity('sessions')
 export class Session {
-  @Prop({ type: String, require: true })
-  userId: string;
+  @PrimaryGeneratedColumn({ type: 'bigint' })
+  id?: number;
 
-  @Prop({ type: String, require: true })
+  @Column({ type: 'uuid' })
+  user_id: string;
+
+  @Column({ type: 'varchar', length: 255, nullable: false })
   ip: string;
 
-  @Prop({ type: String, require: true })
+  @Column({ type: 'varchar', length: 255, nullable: false })
   title: string;
 
-  @Prop({ type: String, require: true })
-  lastActiveDate: string;
+  @Column({ type: 'timestamptz', nullable: false })
+  last_active_date: Date;
 
-  @Prop({ type: String, require: true })
-  tokenIssueDate: string;
+  @Column({ type: 'timestamptz', nullable: false })
+  token_issue_date: Date;
 
-  @Prop({ type: String, require: true })
-  tokenExpirationDate: string;
+  @Column({ type: 'timestamptz', nullable: false })
+  token_expiration_date: Date;
 
-  @Prop({ type: String, require: true })
-  deviceId: string;
+  @Column({ type: 'uuid', nullable: false })
+  device_id: string;
+
+  @ManyToOne(() => User, (user) => user.sessions, {
+    nullable: false,
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'user_id' })
+  user?: User;
 }
-
-export const SessionSchema = SchemaFactory.createForClass(Session);
-//Для загрузки статических методов
-SessionSchema.loadClass(Session);
-
-//Types
-export type SessionDocument = HydratedDocument<Session>;
-
-export type SessionModelType = Model<SessionDocument>;

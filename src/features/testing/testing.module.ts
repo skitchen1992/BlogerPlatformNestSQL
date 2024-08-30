@@ -5,13 +5,13 @@ import { TestingController } from '@features/testing/api/testing.controller';
 import {
   Session,
   SessionSchema,
-} from '@features/session/domain/session.entity';
+} from '@features/session/domain/session-mongo.entity';
 import {
   Comment,
   CommentSchema,
 } from '@features/comments/domain/comment.entity';
 import { Blog, BlogSchema } from '@features/blogs/domain/blog.entity';
-import { User, UserSchema } from '@features/users/domain/user.entity';
+import { User, UserSchema } from '@features/users/domain/user-mongo.entity';
 
 @Module({
   imports: [

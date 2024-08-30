@@ -1,4 +1,4 @@
-import { UserDocument } from '../../../domain/user.entity';
+import { User } from '@features/users/domain/user.entity';
 
 export class UserOutputDto {
   id: string;
@@ -9,13 +9,13 @@ export class UserOutputDto {
 
 // MAPPERS
 
-export const UserOutputDtoMapper = (user: UserDocument): UserOutputDto => {
+export const UserOutputDtoMapper = (user: User): UserOutputDto => {
   const outputDto = new UserOutputDto();
 
-  outputDto.id = user._id.toString();
+  outputDto.id = user.id!;
   outputDto.login = user.login;
   outputDto.email = user.email;
-  outputDto.createdAt = user.createdAt;
+  outputDto.createdAt = user.created_at;
 
   return outputDto;
 };

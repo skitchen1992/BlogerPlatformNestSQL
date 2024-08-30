@@ -6,7 +6,6 @@ import {
   getCurrentISOStringDate,
   isExpiredDate,
 } from '@utils/dates';
-import { NewPasswordDtoMapper } from '@features/auth/api/dto/new-password.dto';
 import { SharedService } from '@infrastructure/servises/shared/shared.service';
 
 export class NewPassportCommand {
@@ -51,8 +50,8 @@ export class NewPassportHandler
     const user = await this.usersRepository.get(userId);
 
     if (
-      user?.recoveryCode?.isUsed ||
-      user?.recoveryCode?.code !== recoveryCode
+      user?.recovery_is_confirmed ||
+      user?.recovery_confirmation_code !== recoveryCode
     ) {
       throw new BadRequestException({
         message: 'Recovery code not correct',
@@ -64,9 +63,6 @@ export class NewPassportHandler
       newPassword,
     );
 
-    await this.usersRepository.update(
-      userId,
-      NewPasswordDtoMapper(passwordHash),
-    );
+    await this.usersRepository.updatePassword(userId, passwordHash);
   }
 }

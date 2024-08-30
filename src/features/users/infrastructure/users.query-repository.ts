@@ -1,6 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { User, UserDocument, UserModelType } from '../domain/user.entity';
-import { InjectModel } from '@nestjs/mongoose';
 import {
   UserOutputDto,
   UserOutputDtoMapper,
@@ -11,113 +9,134 @@ import {
   UserOutputPaginationDto,
   UserOutputPaginationDtoMapper,
 } from '@features/users/api/dto/output/user.output.pagination.dto';
+import { InjectDataSource } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
 
 @Injectable()
 export class UsersQueryRepository {
   constructor(
-    @InjectModel(User.name) private userModel: UserModelType,
+    @InjectDataSource() private dataSource: DataSource,
     private readonly pagination: Pagination,
   ) {}
 
   public async getById(userId: string): Promise<UserOutputDto | null> {
-    const user = await this.userModel.findById(userId).lean();
+    const user = await this.dataSource.query(
+      `
+SELECT  u.id, 
+        u.login, 
+        u.password, 
+        u.email, 
+        u.created_at,
+        rc.is_confirmed AS recovery_is_confirmed,
+        rc.confirmation_code AS recovery_confirmation_code,
+        ec.is_confirmed AS email_is_confirmed,
+        ec.confirmation_code AS email_confirmation_code,
+        ec.expiration_date AS email_expiration_date FROM users u 
+LEFT join email_confirmations ec ON u.id = ec.user_id 
+LEFT join recovery_code rc ON u.id = rc.user_id
+where u.id = $1
+    `,
+      [userId],
+    );
 
-    if (!user) {
+    if (!Boolean(user.length)) {
       return null;
     }
 
-    return UserOutputDtoMapper(user);
+    return UserOutputDtoMapper(user.at(0));
   }
 
   public async getAll(query: UsersQuery): Promise<UserOutputPaginationDto> {
-    const pagination = this.pagination.getUsers(query);
+    const {
+      searchLoginTerm,
+      searchEmailTerm,
+      sortBy = 'createdAt',
+      sortDirection = 'desc',
+      pageNumber = 1,
+      pageSize = 10,
+    } = query;
 
-    const users = await this.userModel
-      .find(pagination.query)
-      .sort(pagination.sort)
-      .skip(pagination.skip)
-      .limit(pagination.pageSize)
-      .lean();
+    const validSortDirections = ['asc', 'desc'];
+    const direction = validSortDirections.includes(sortDirection)
+      ? sortDirection
+      : 'desc';
 
-    const totalCount = await this.userModel.countDocuments(pagination.query);
+    const validSortFields = ['created_at', 'login', 'email'];
+    const sortField = validSortFields.includes(sortBy) ? sortBy : 'created_at';
+
+    let whereConditions = '';
+    const queryParams: any[] = [];
+
+    if (searchLoginTerm && searchEmailTerm) {
+      whereConditions = `
+      (u.login ~* $1 OR u.email ~* $2)
+    `;
+      queryParams.push(`.*${searchLoginTerm}.*`, `.*${searchEmailTerm}.*`);
+    } else if (searchLoginTerm) {
+      whereConditions = `u.login ~* $1`;
+      queryParams.push(`.*${searchLoginTerm}.*`);
+    } else if (searchEmailTerm) {
+      whereConditions = `u.email ~* $1`;
+      queryParams.push(`.*${searchEmailTerm}.*`);
+    } else {
+      whereConditions = 'TRUE'; // No search criteria, fetch all
+    }
+
+    // Добавляем COLLATE только для login и email
+    const collateClause =
+      sortField === 'login' || sortField === 'email' ? 'COLLATE "C"' : '';
+
+    const users = await this.dataSource.query(
+      `
+    SELECT
+        u.id,
+        u.login,
+        u.password,
+        u.email,
+        u.created_at,
+        rc.is_confirmed AS recovery_is_confirmed,
+        rc.confirmation_code AS recovery_confirmation_code,
+        ec.is_confirmed AS email_is_confirmed,
+        ec.confirmation_code AS email_confirmation_code,
+        ec.expiration_date AS email_expiration_date
+    FROM
+        users u
+    LEFT JOIN
+        email_confirmations ec ON u.id = ec.user_id
+    LEFT JOIN
+        recovery_code rc ON u.id = rc.user_id
+    WHERE
+        ${whereConditions}
+    ORDER BY
+        ${sortField} ${collateClause} ${direction}
+    LIMIT $${queryParams.length + 1}
+    OFFSET $${queryParams.length + 2} * ($${queryParams.length + 3} - 1);
+    `,
+      [
+        ...queryParams,
+        pageSize, // LIMIT
+        pageSize, // OFFSET calculation
+        pageNumber, // used for OFFSET
+      ],
+    );
+
+    const totalCount = await this.dataSource.query(
+      `
+    SELECT COUNT(*)::int AS count
+    FROM users u
+    WHERE
+        ${whereConditions}
+    `,
+      queryParams,
+    );
 
     const userList = users.map((user) => UserOutputDtoMapper(user));
 
     return UserOutputPaginationDtoMapper(
       userList,
-      totalCount,
-      pagination.pageSize,
-      pagination.page,
+      totalCount.at(0).count,
+      Number(pageSize),
+      Number(pageNumber),
     );
-  }
-
-  public async getUserByLoginOrEmail(
-    login: string,
-    email: string,
-  ): Promise<{
-    user: UserDocument | null;
-    foundBy: string | null;
-  }> {
-    const user = await this.userModel
-      .findOne({
-        $or: [{ login }, { email }],
-      })
-      .lean();
-
-    if (!user) {
-      return { user: null, foundBy: null };
-    }
-
-    const foundBy = user.login === login ? 'login' : 'email';
-    return { user, foundBy };
-  }
-
-  public async getUserByConfirmationCode(
-    code: string,
-  ): Promise<UserDocument | null> {
-    const user = await this.userModel
-      .findOne({
-        'emailConfirmation.confirmationCode': code,
-      })
-      .lean();
-
-    if (!user) {
-      return null;
-    }
-
-    return user;
-  }
-
-  public async updateUserFieldById(
-    id: string,
-    field: string,
-    data: unknown,
-  ): Promise<boolean> {
-    const updateResult = await this.userModel.updateOne(
-      { _id: id },
-      { $set: { [field]: data } },
-    );
-
-    return updateResult.modifiedCount === 1;
-  }
-
-  public async isLoginExist(login: string): Promise<boolean> {
-    const user = await this.userModel.findOne({ login: login }).lean();
-    return !user;
-  }
-
-  public async isEmailExist(email: string): Promise<boolean> {
-    const user = await this.userModel.findOne({ email: email }).lean();
-
-    return !user;
-  }
-  public async isUserExist(login: string, email: string): Promise<boolean> {
-    const user = await this.userModel
-      .findOne({
-        $or: [{ login }, { email }],
-      })
-      .lean();
-
-    return !!user;
   }
 }
