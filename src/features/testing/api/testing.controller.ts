@@ -30,7 +30,7 @@ export class TestingController {
     await this.userModel.deleteMany({});
     await this.commentsModel.deleteMany({});
 
-    const tables = ['users']; // Список всех таблиц, которые нужно очистить
+    const tables = ['users', 'blogs']; // Список всех таблиц, которые нужно очистить
 
     for (const table of tables) {
       await this.dataSource.query(

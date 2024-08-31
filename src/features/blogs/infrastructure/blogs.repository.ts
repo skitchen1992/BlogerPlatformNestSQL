@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { BlogDocument, BlogModelType } from '../domain/blog-mongo.entity';
-import { UpdateQuery } from 'mongoose';
 import { Blog } from '@features/blogs/domain/blog.entity';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
+import { UpdateBlogDto } from '@features/blogs/api/dto/input/update-blog.input.dto';
 
 @Injectable()
 export class BlogsRepository {
@@ -52,12 +52,28 @@ export class BlogsRepository {
     }
   }
 
-  public async update(id: string, data: UpdateQuery<Blog>): Promise<boolean> {
+  public async updateBlogById(
+    blogId: string,
+    data: UpdateBlogDto,
+  ): Promise<boolean> {
     try {
-      const updatedResult = await this.blogModel.updateOne({ _id: id }, data);
+      const updateResult = await this.dataSource.query(
+        `
+      UPDATE blogs
+      SET name = $1, 
+          description = $2,
+          website_url = $3
+      WHERE id = $4
+      RETURNING id;
+      `,
+        [data.name, data.description, data.websiteUrl, blogId],
+      );
 
-      return updatedResult.modifiedCount === 1;
+      return Boolean(updateResult.at(1));
     } catch (e) {
+      console.error('Error updating blog into database', {
+        error: e,
+      });
       return false;
     }
   }
