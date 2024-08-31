@@ -10,7 +10,7 @@ import {
   Comment,
   CommentSchema,
 } from '@features/comments/domain/comment.entity';
-import { Blog, BlogSchema } from '@features/blogs/domain/blog.entity';
+import { Blog, BlogSchema } from '@features/blogs/domain/blog-mongo.entity';
 import { User, UserSchema } from '@features/users/domain/user-mongo.entity';
 
 @Module({

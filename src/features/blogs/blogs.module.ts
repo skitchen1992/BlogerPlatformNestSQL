@@ -12,7 +12,7 @@ import { GetPostForBlogHandler } from '@features/blogs/application/handlers/get-
 import { GetBlogHandler } from '@features/blogs/application/handlers/get-blog.handler';
 import { BlogsController } from '@features/blogs/api/blogs.controller';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Blog, BlogSchema } from '@features/blogs/domain/blog.entity';
+import { Blog, BlogSchema } from '@features/blogs/domain/blog-mongo.entity';
 import { PostsModule } from '@features/posts/posts.module';
 import { UsersModule } from '@features/users/users.module';
 

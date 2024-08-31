@@ -1,7 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { Blog } from '@features/blogs/domain/blog.entity';
 import { BlogsRepository } from '@features/blogs/infrastructure/blogs.repository';
-import { getCurrentISOStringDate } from '@utils/dates';
+import { Blog } from '@features/blogs/domain/blog.entity';
 
 export class CreateBlogCommand {
   constructor(
@@ -22,9 +21,8 @@ export class CreateBlogHandler
     const newBlog: Blog = {
       name,
       description,
-      websiteUrl,
-      createdAt: getCurrentISOStringDate(),
-      isMembership: false,
+      website_url: websiteUrl,
+      is_membership: false,
     };
 
     return await this.blogsRepository.create(newBlog);

@@ -17,14 +17,14 @@
 // import { LikeStatusEnum } from '@features/likes/domain/likes.entity';
 //
 // describe(`Endpoint (GET) - /:commentId`, () => {
-//   it('Should get comment', async () => {
+//   it('Should getUserById comment', async () => {
 //     const commentList = await mockCommentModel.insertMany(
 //       testSeeder.createCommentListDto(1),
 //     );
 //     const commentId = commentList[0]._id.toString();
 //
 //     const res = await request(app.getHttpServer())
-//       .get(`${APP_PREFIX}/comments/${commentId}`)
+//       .getUserById(`${APP_PREFIX}/comments/${commentId}`)
 //       .expect(HttpStatus.OK);
 //
 //     const comment = {
@@ -45,7 +45,7 @@
 //     expect(res.body).toEqual(comment);
 //   });
 //
-//   it(`Should get comment with ${LikeStatusEnum.NONE} status`, async () => {
+//   it(`Should getUserById comment with ${LikeStatusEnum.NONE} status`, async () => {
 //     const login = 'testLogin';
 //     const password = 'string';
 //
@@ -85,7 +85,7 @@
 //       .expect(HttpStatus.NO_CONTENT);
 //
 //     const res = await request(app.getHttpServer())
-//       .get(`${APP_PREFIX}/comments/${commentId}`)
+//       .getUserById(`${APP_PREFIX}/comments/${commentId}`)
 //       .expect(HttpStatus.OK);
 //
 //     const comment = {
@@ -106,9 +106,9 @@
 //     expect(res.body).toEqual(comment);
 //   });
 //
-//   it(`Should get ${HttpStatus.NOT_FOUND}`, async () => {
+//   it(`Should getUserById ${HttpStatus.NOT_FOUND}`, async () => {
 //     await request(app.getHttpServer())
-//       .get(`${APP_PREFIX}/comments/${ID}`)
+//       .getUserById(`${APP_PREFIX}/comments/${ID}`)
 //       .expect(HttpStatus.NOT_FOUND);
 //   });
 // });
@@ -167,7 +167,7 @@
 //       .expect(HttpStatus.NO_CONTENT);
 //
 //     const res = await request(app.getHttpServer())
-//       .get(`${APP_PREFIX}/comments/${comment.body.id.toString()}`)
+//       .getUserById(`${APP_PREFIX}/comments/${comment.body.id.toString()}`)
 //       .expect(HttpStatus.OK);
 //
 //     expect(res.body).toEqual(
@@ -177,7 +177,7 @@
 //     );
 //   });
 //
-//   it(`Should get ${HttpStatus.BAD_REQUEST}`, async () => {
+//   it(`Should getUserById ${HttpStatus.BAD_REQUEST}`, async () => {
 //     const login = 'testLogin';
 //     const password = 'string';
 //
@@ -239,7 +239,7 @@
 //     });
 //   });
 //
-//   it(`Should get ${HttpStatus.UNAUTHORIZED}`, async () => {
+//   it(`Should getUserById ${HttpStatus.UNAUTHORIZED}`, async () => {
 //     const login = 'testLogin';
 //     const password = 'string';
 //
@@ -291,7 +291,7 @@
 //       .expect(HttpStatus.UNAUTHORIZED);
 //   });
 //
-//   it(`Should get ${HttpStatus.NOT_FOUND}`, async () => {
+//   it(`Should getUserById ${HttpStatus.NOT_FOUND}`, async () => {
 //     const login = 'testLogin';
 //     const password = 'string';
 //
@@ -344,7 +344,7 @@
 //       .expect(HttpStatus.NOT_FOUND);
 //   });
 //
-//   it(`Should get ${HttpStatus.FORBIDDEN}`, async () => {
+//   it(`Should getUserById ${HttpStatus.FORBIDDEN}`, async () => {
 //     const login = 'testLogin';
 //     const password = 'string';
 //
@@ -482,7 +482,7 @@
 //       .expect(HttpStatus.NO_CONTENT);
 //   });
 //
-//   it(`Should get ${HttpStatus.UNAUTHORIZED}`, async () => {
+//   it(`Should getUserById ${HttpStatus.UNAUTHORIZED}`, async () => {
 //     const login = 'testLogin';
 //     const password = 'string';
 //
@@ -531,7 +531,7 @@
 //       .expect(HttpStatus.UNAUTHORIZED);
 //   });
 //
-//   it(`Should get ${HttpStatus.NOT_FOUND}`, async () => {
+//   it(`Should getUserById ${HttpStatus.NOT_FOUND}`, async () => {
 //     const login = 'testLogin';
 //     const password = 'string';
 //
@@ -584,7 +584,7 @@
 //       .expect(HttpStatus.NOT_FOUND);
 //   });
 //
-//   it(`Should get ${HttpStatus.FORBIDDEN}`, async () => {
+//   it(`Should getUserById ${HttpStatus.FORBIDDEN}`, async () => {
 //     const login = 'testLogin';
 //     const password = 'string';
 //
@@ -714,7 +714,7 @@
 //       .expect(HttpStatus.NO_CONTENT);
 //
 //     const res = await request(app.getHttpServer())
-//       .get(`${APP_PREFIX}/comments/${commentId}`)
+//       .getUserById(`${APP_PREFIX}/comments/${commentId}`)
 //       .set(createBearerAuthorizationHeader(token.body.accessToken))
 //       .expect(HttpStatus.OK);
 //
@@ -787,7 +787,7 @@
 //       .expect(HttpStatus.NO_CONTENT);
 //
 //     const res = await request(app.getHttpServer())
-//       .get(`${APP_PREFIX}/comments/${commentId}`)
+//       .getUserById(`${APP_PREFIX}/comments/${commentId}`)
 //       .set(createBearerAuthorizationHeader(token.body.accessToken))
 //       .expect(HttpStatus.OK);
 //
@@ -860,7 +860,7 @@
 //       .expect(HttpStatus.NO_CONTENT);
 //
 //     const res = await request(app.getHttpServer())
-//       .get(`${APP_PREFIX}/comments/${commentId}`)
+//       .getUserById(`${APP_PREFIX}/comments/${commentId}`)
 //       .set(createBearerAuthorizationHeader(token.body.accessToken))
 //       .expect(HttpStatus.OK);
 //
@@ -933,7 +933,7 @@
 //       .expect(HttpStatus.NO_CONTENT);
 //
 //     const res = await request(app.getHttpServer())
-//       .get(`${APP_PREFIX}/comments/${commentId}`)
+//       .getUserById(`${APP_PREFIX}/comments/${commentId}`)
 //       .set(createBearerAuthorizationHeader(token.body.accessToken))
 //       .expect(HttpStatus.OK);
 //
@@ -948,7 +948,7 @@
 //     );
 //   });
 //
-//   it(`Should get ${HttpStatus.BAD_REQUEST}`, async () => {
+//   it(`Should getUserById ${HttpStatus.BAD_REQUEST}`, async () => {
 //     const login = 'testLogin';
 //     const password = 'string';
 //
@@ -998,7 +998,7 @@
 //       .expect(HttpStatus.BAD_REQUEST);
 //   });
 //
-//   it(`Should get ${HttpStatus.UNAUTHORIZED}`, async () => {
+//   it(`Should getUserById ${HttpStatus.UNAUTHORIZED}`, async () => {
 //     const login = 'testLogin';
 //     const password = 'string';
 //
@@ -1041,7 +1041,7 @@
 //       .expect(HttpStatus.UNAUTHORIZED);
 //   });
 //
-//   it(`Should get ${HttpStatus.NOT_FOUND}`, async () => {
+//   it(`Should getUserById ${HttpStatus.NOT_FOUND}`, async () => {
 //     const login = 'testLogin';
 //     const password = 'string';
 //

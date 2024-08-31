@@ -1,4 +1,4 @@
-import { BlogDocument } from '../../../domain/blog.entity';
+import { BlogDetails } from '@features/blogs/api/dto/BlogDetais';
 
 export class BlogOutputDto {
   id: string;
@@ -11,15 +11,15 @@ export class BlogOutputDto {
 
 // MAPPERS
 
-export const BlogOutputDtoMapper = (blog: BlogDocument): BlogOutputDto => {
+export const BlogOutputDtoMapper = (blog: BlogDetails): BlogOutputDto => {
   const outputDto = new BlogOutputDto();
 
-  outputDto.id = blog._id.toString();
+  outputDto.id = blog.id;
   outputDto.name = blog.name;
   outputDto.description = blog.description;
-  outputDto.websiteUrl = blog.websiteUrl;
-  outputDto.createdAt = blog.createdAt;
-  outputDto.isMembership = blog.isMembership;
+  outputDto.websiteUrl = blog.website_url;
+  outputDto.createdAt = blog.created_at.toISOString();
+  outputDto.isMembership = blog.is_membership;
 
   return outputDto;
 };

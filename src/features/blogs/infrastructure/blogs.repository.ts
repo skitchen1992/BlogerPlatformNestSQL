@@ -1,11 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Blog, BlogDocument, BlogModelType } from '../domain/blog.entity';
+import { BlogDocument, BlogModelType } from '../domain/blog-mongo.entity';
 import { UpdateQuery } from 'mongoose';
+import { Blog } from '@features/blogs/domain/blog.entity';
+import { InjectDataSource } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
 
 @Injectable()
 export class BlogsRepository {
-  constructor(@InjectModel(Blog.name) private blogModel: BlogModelType) {}
+  constructor(
+    @InjectModel(Blog.name) private blogModel: BlogModelType,
+    @InjectDataSource() private dataSource: DataSource,
+  ) {}
 
   public async get(id: string): Promise<BlogDocument | null> {
     try {
@@ -22,9 +28,28 @@ export class BlogsRepository {
   }
 
   public async create(newBlog: Blog): Promise<string> {
-    const insertResult = await this.blogModel.insertMany([newBlog]);
+    try {
+      const result = await this.dataSource.query(
+        `
+      INSERT INTO blogs (name, description, website_url, is_membership)
+      VALUES ($1, $2, $3, $4)
+      RETURNING id;
+    `,
+        [
+          newBlog.name,
+          newBlog.description,
+          newBlog.website_url,
+          newBlog.is_membership,
+        ],
+      );
 
-    return insertResult[0].id;
+      return result[0].id;
+    } catch (e) {
+      console.error('Error inserting blog into database', {
+        error: e,
+      });
+      return '';
+    }
   }
 
   public async update(id: string, data: UpdateQuery<Blog>): Promise<boolean> {
