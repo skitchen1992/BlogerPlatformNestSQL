@@ -1,5 +1,5 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { Post } from '@features/posts/domain/post.entity';
+import { Post } from '@features/posts/domain/post-mongo.entity';
 import { PostsRepository } from '@features/posts/infrastructure/posts.repository';
 import { NotFoundException } from '@nestjs/common';
 import { BlogsRepository } from '@features/blogs/infrastructure/blogs.repository';

@@ -5,7 +5,7 @@ import {
   CommentModelType,
 } from '@features/comments/domain/comment.entity';
 import { Blog, BlogModelType } from '@features/blogs/domain/blog-mongo.entity';
-import { Post, PostModelType } from '@features/posts/domain/post.entity';
+import { Post, PostModelType } from '@features/posts/domain/post-mongo.entity';
 import { User, UserModelType } from '@features/users/domain/user-mongo.entity';
 import { SkipThrottle } from '@nestjs/throttler';
 import { InjectDataSource } from '@nestjs/typeorm';

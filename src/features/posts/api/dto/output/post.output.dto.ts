@@ -1,4 +1,4 @@
-import { PostDocument } from '../../../domain/post.entity';
+import { PostDocument } from '../../../domain/post-mongo.entity';
 import { LikeStatusEnum } from '@features/likes/domain/likes.entity';
 
 export type NewestLike = {

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Post, PostModelType } from '../domain/post.entity';
+import { Post, PostModelType } from '../domain/post-mongo.entity';
 import { InjectModel } from '@nestjs/mongoose';
 import {
   ExtendedLikesInfo,
