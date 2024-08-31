@@ -688,7 +688,7 @@
 // });
 //
 // describe(`Endpoint (DELETE) - /posts/:id`, () => {
-//   it('Should delete post', async () => {
+//   it('Should deleteBlogById post', async () => {
 //     const blogList = await mockBlogModel.insertMany(
 //       testSeeder.createBlogListDto(1),
 //     );
@@ -700,7 +700,7 @@
 //     const postId = postList[0]._id.toString();
 //
 //     await request(app.getHttpServer())
-//       .delete(`${APP_PREFIX}/posts/${postId}`)
+//       .deleteBlogById(`${APP_PREFIX}/posts/${postId}`)
 //       .set(
 //         createAuthorizationHeader(
 //           apiSettings.ADMIN_AUTH_USERNAME,
@@ -726,7 +726,7 @@
 //     const postId = postList[0]._id.toString();
 //
 //     await request(app.getHttpServer())
-//       .delete(`${APP_PREFIX}/posts/${ID}`)
+//       .deleteBlogById(`${APP_PREFIX}/posts/${ID}`)
 //       .set(
 //         createAuthorizationHeader(
 //           apiSettings.ADMIN_AUTH_USERNAME,

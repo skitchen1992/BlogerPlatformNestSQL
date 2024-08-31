@@ -14,7 +14,7 @@ export class DeleteBlogHandler
   async execute(command: DeleteBlogCommand): Promise<void> {
     const { id } = command;
 
-    const isDeleted: boolean = await this.blogsRepository.delete(id);
+    const isDeleted: boolean = await this.blogsRepository.deleteBlogById(id);
 
     if (!isDeleted) {
       throw new NotFoundException(`Blog with id ${id} not found`);

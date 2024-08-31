@@ -78,12 +78,20 @@ export class BlogsRepository {
     }
   }
 
-  public async delete(id: string): Promise<boolean> {
+  public async deleteBlogById(blogId: string): Promise<boolean> {
     try {
-      const deleteResult = await this.blogModel.deleteOne({ _id: id });
+      const result = await this.dataSource.query(
+        `
+      DELETE FROM blogs 
+      WHERE id = $1
+      RETURNING *;
+      `,
+        [blogId],
+      );
 
-      return deleteResult.deletedCount === 1;
+      return Boolean(result.at(1));
     } catch (e) {
+      console.error('Error during deleteBlogById operation:', e);
       return false;
     }
   }

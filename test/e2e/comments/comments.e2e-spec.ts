@@ -424,7 +424,7 @@
 // });
 //
 // describe(`Endpoint (DELETE) -/comments`, () => {
-//   it('Should delete comment', async () => {
+//   it('Should deleteBlogById comment', async () => {
 //     const login = 'testLogin';
 //     const password = 'string';
 //
@@ -477,7 +477,7 @@
 //       .expect(HttpStatus.NO_CONTENT);
 //
 //     await request(app.getHttpServer())
-//       .delete(`${APP_PREFIX}/comments/${comment.body.id.toString()}`)
+//       .deleteBlogById(`${APP_PREFIX}/comments/${comment.body.id.toString()}`)
 //       .set(createBearerAuthorizationHeader(token.body.accessToken))
 //       .expect(HttpStatus.NO_CONTENT);
 //   });
@@ -527,7 +527,7 @@
 //       .expect(HttpStatus.CREATED);
 //
 //     await request(app.getHttpServer())
-//       .delete(`${APP_PREFIX}/comments/${comment.body.id.toString()}`)
+//       .deleteBlogById(`${APP_PREFIX}/comments/${comment.body.id.toString()}`)
 //       .expect(HttpStatus.UNAUTHORIZED);
 //   });
 //
@@ -576,7 +576,7 @@
 //       .expect(HttpStatus.CREATED);
 //
 //     await request(app.getHttpServer())
-//       .delete(`${APP_PREFIX}/comments/${ID}`)
+//       .deleteBlogById(`${APP_PREFIX}/comments/${ID}`)
 //       .set(createBearerAuthorizationHeader(token.body.accessToken))
 //       .send({
 //         content: 'co content content content',
@@ -654,7 +654,7 @@
 //       .expect(HttpStatus.CREATED);
 //
 //     await request(app.getHttpServer())
-//       .delete(`${APP_PREFIX}/comments/${comment.body.id.toString()}`)
+//       .deleteBlogById(`${APP_PREFIX}/comments/${comment.body.id.toString()}`)
 //       .set(createBearerAuthorizationHeader(token2.body.accessToken))
 //       .send({
 //         content: 'co content content content',

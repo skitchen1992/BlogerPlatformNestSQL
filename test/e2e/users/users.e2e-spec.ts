@@ -331,7 +331,7 @@ describe('Users (e2e) POST', () => {
 });
 
 describe('Users (e2e) DELETE', () => {
-  it('Should delete user', async () => {
+  it('Should deleteBlogById user', async () => {
     const user = testSeeder.createUserDto();
 
     const result = await dataSource.query(

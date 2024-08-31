@@ -102,7 +102,7 @@ export class UsersRepository {
 
       return Boolean(result.at(1));
     } catch (e) {
-      console.error('Error during delete operation:', e);
+      console.error('Error during deleteBlogById operation:', e);
       return false;
     }
   }

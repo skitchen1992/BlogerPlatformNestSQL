@@ -99,8 +99,6 @@ export class SessionsRepository {
         [userId],
       );
 
-      console.log('deleteResult', deleteResult);
-
       return Boolean(deleteResult.at(1));
     } catch (e) {
       return false;
