@@ -1,11 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { Blog, BlogModelType } from '../domain/blog-mongo.entity';
-import { InjectModel } from '@nestjs/mongoose';
 import {
   BlogOutputDto,
   BlogOutputDtoMapper,
 } from '../api/dto/output/blog.output.dto';
-import { Pagination } from '@base/models/pagination.base.model';
 import {
   BlogOutputPaginationDto,
   BlogOutputPaginationDtoMapper,
@@ -13,14 +10,11 @@ import {
 } from '@features/blogs/api/dto/output/blog.output.pagination.dto';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
+import { BlogDetails } from '@features/blogs/api/dto/BlogDetais';
 
 @Injectable()
 export class BlogsQueryRepository {
-  constructor(
-    @InjectModel(Blog.name) private blogModel: BlogModelType,
-    @InjectDataSource() private dataSource: DataSource,
-    private readonly pagination: Pagination,
-  ) {}
+  constructor(@InjectDataSource() private dataSource: DataSource) {}
 
   public async getById(blogId: string): Promise<BlogOutputDto | null> {
     try {
@@ -44,24 +38,69 @@ export class BlogsQueryRepository {
   }
 
   public async getAll(query: BlogsQuery): Promise<BlogOutputPaginationDto> {
-    const pagination = this.pagination.getBlogs(query);
+    const {
+      searchNameTerm,
+      sortBy = 'createdAt',
+      sortDirection = 'desc',
+      pageNumber = 1,
+      pageSize = 10,
+    } = query;
 
-    const users = await this.blogModel
-      .find(pagination.query)
-      .sort(pagination.sort)
-      .skip(pagination.skip)
-      .limit(pagination.pageSize)
-      .lean();
+    const validSortDirections = ['asc', 'desc'];
+    const direction = validSortDirections.includes(sortDirection)
+      ? sortDirection
+      : 'desc';
 
-    const totalCount = await this.blogModel.countDocuments(pagination.query);
-    //@ts-ignore
-    const blogList = users.map((user) => BlogOutputDtoMapper(user));
+    const validSortFields = ['created_at', 'name'];
+    const sortField = validSortFields.includes(sortBy) ? sortBy : 'created_at';
+
+    let whereConditions = '';
+    const queryParams: any[] = [];
+
+    if (searchNameTerm) {
+      whereConditions = `name ~* $1`;
+      queryParams.push(`.*${searchNameTerm}.*`);
+    } else {
+      whereConditions = 'TRUE';
+    }
+
+    const blogs: BlogDetails[] = await this.dataSource.query(
+      `
+    SELECT *
+    FROM
+        blogs 
+    WHERE
+        ${whereConditions}
+    ORDER BY
+        ${sortField} ${direction}
+    LIMIT $${queryParams.length + 1}
+    OFFSET $${queryParams.length + 2} * ($${queryParams.length + 3} - 1);
+    `,
+      [
+        ...queryParams,
+        pageSize, // LIMIT
+        pageSize, // OFFSET calculation
+        pageNumber, // used for OFFSET
+      ],
+    );
+
+    const totalCount = await this.dataSource.query(
+      `
+    SELECT COUNT(*)::int AS count
+    FROM blogs
+    WHERE
+        ${whereConditions}
+    `,
+      queryParams,
+    );
+
+    const blogList = blogs.map((blog) => BlogOutputDtoMapper(blog));
 
     return BlogOutputPaginationDtoMapper(
       blogList,
-      totalCount,
-      pagination.pageSize,
-      pagination.page,
+      totalCount.at(0).count,
+      Number(pageSize),
+      Number(pageNumber),
     );
   }
 }

@@ -22,5 +22,5 @@ export class Blog {
   is_membership: boolean;
 
   @OneToMany(() => Post, (post) => post.blog)
-  posts: Post[];
+  posts?: Post[];
 }
