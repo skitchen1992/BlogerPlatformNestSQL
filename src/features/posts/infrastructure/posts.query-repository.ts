@@ -23,6 +23,8 @@ import { NEWEST_LIKES_COUNT } from '@utils/consts';
 import { User, UserModelType } from '@features/users/domain/user-mongo.entity';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
+import { BlogDetails } from '@features/blogs/api/dto/BlogDetais';
+import { PostDetails } from '@features/posts/api/dto/PostDetais';
 
 @Injectable()
 export class PostsQueryRepository {
@@ -164,41 +166,83 @@ export class PostsQueryRepository {
     params?: { blogId?: string },
     userId?: string,
   ): Promise<PostOutputPaginationDto> {
-    const pagination = this.pagination.getPosts(query, params);
+    const {
+      sortBy = 'createdAt',
+      sortDirection = 'desc',
+      pageNumber = 1,
+      pageSize = 10,
+    } = query;
 
-    const posts = await this.postModel
-      .find(pagination.query)
-      .sort(pagination.sort)
-      .skip(pagination.skip)
-      .limit(pagination.pageSize)
-      .lean();
+    const validSortDirections = ['asc', 'desc'];
+    const direction = validSortDirections.includes(sortDirection)
+      ? sortDirection
+      : 'desc';
 
-    const totalCount = await this.postModel.countDocuments(pagination.query);
+    const validSortFields = ['created_at'];
+    const sortField = validSortFields.includes(sortBy) ? sortBy : 'created_at';
+
+    let whereConditions = '';
+    const queryParams: any[] = [];
+
+    if (params?.blogId) {
+      whereConditions = `blog_id = $1`;
+      queryParams.push(params.blogId);
+    } else {
+      whereConditions = 'TRUE';
+    }
+
+    const posts: PostDetails[] = await this.dataSource.query(
+      `
+    SELECT *
+    FROM
+        posts 
+    WHERE
+        ${whereConditions}
+    ORDER BY
+        ${sortField} ${direction}
+    LIMIT $${queryParams.length + 1}
+    OFFSET $${queryParams.length + 2} * ($${queryParams.length + 3} - 1);
+    `,
+      [
+        ...queryParams,
+        pageSize, // LIMIT
+        pageSize, // OFFSET calculation
+        pageNumber, // used for OFFSET
+      ],
+    );
 
     const postList = await Promise.all(
       posts.map(async (post) => {
         if (userId) {
           const extendedLikesInfo = await this.getLikesInfoForAuthUser(
-            post._id.toString(),
+            post.id,
             userId,
           );
-          //@ts-ignore
           return PostOutputDtoMapper(post, extendedLikesInfo);
         } else {
           const extendedLikesInfo = await this.getLikesInfoForNotAuthUser(
-            post._id.toString(),
+            post.id,
           );
-          //@ts-ignore
           return PostOutputDtoMapper(post, extendedLikesInfo);
         }
       }),
     );
 
+    const totalCount = await this.dataSource.query(
+      `
+    SELECT COUNT(*)::int AS count
+    FROM posts
+    WHERE
+        ${whereConditions}
+    `,
+      queryParams,
+    );
+
     return PostOutputPaginationDtoMapper(
       postList,
-      totalCount,
-      pagination.pageSize,
-      pagination.page,
+      totalCount.at(0).count,
+      Number(pageSize),
+      Number(pageNumber),
     );
   }
 }
