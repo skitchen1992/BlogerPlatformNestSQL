@@ -21,6 +21,8 @@ import {
 } from '@features/likes/domain/likes.entity';
 import { NEWEST_LIKES_COUNT } from '@utils/consts';
 import { User, UserModelType } from '@features/users/domain/user-mongo.entity';
+import { InjectDataSource } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
 
 @Injectable()
 export class PostsQueryRepository {
@@ -29,6 +31,7 @@ export class PostsQueryRepository {
     @InjectModel(User.name) private userModel: UserModelType,
     @InjectModel(Like.name) private likeModel: LikeModelType,
     private readonly pagination: Pagination,
+    @InjectDataSource() private dataSource: DataSource,
   ) {}
 
   private async getLikeDislikeCounts(
@@ -131,7 +134,16 @@ export class PostsQueryRepository {
     userId?: string,
   ): Promise<PostOutputDto | null> {
     try {
-      const post = await this.postModel.findById(postId).lean();
+      const postList = await this.dataSource.query(
+        `
+    SELECT *
+    FROM posts p
+    WHERE p.id = $1
+    `,
+        [postId],
+      );
+
+      const post = postList.at(0);
 
       if (!post) {
         return null;
@@ -170,11 +182,13 @@ export class PostsQueryRepository {
             post._id.toString(),
             userId,
           );
+          //@ts-ignore
           return PostOutputDtoMapper(post, extendedLikesInfo);
         } else {
           const extendedLikesInfo = await this.getLikesInfoForNotAuthUser(
             post._id.toString(),
           );
+          //@ts-ignore
           return PostOutputDtoMapper(post, extendedLikesInfo);
         }
       }),

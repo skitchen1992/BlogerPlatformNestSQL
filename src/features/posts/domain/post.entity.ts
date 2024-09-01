@@ -11,7 +11,7 @@ import { Blog } from '@features/blogs/domain/blog.entity';
 @Entity('posts')
 export class Post {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id?: string;
 
   @Column({ type: 'varchar', length: 30, nullable: false, name: 'title' })
   title: string;
@@ -41,5 +41,5 @@ export class Post {
 
   @ManyToOne(() => Blog, (blog) => blog.posts, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'blog_id' }) // Используем нотацию через нижнее подчеркивание
-  blog: Blog;
+  blog?: Blog;
 }

@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { BlogDocument, BlogModelType } from '../domain/blog-mongo.entity';
+import { BlogModelType } from '../domain/blog-mongo.entity';
 import { Blog } from '@features/blogs/domain/blog.entity';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { UpdateBlogDto } from '@features/blogs/api/dto/input/update-blog.input.dto';
+import { BlogDetails } from '@features/blogs/api/dto/BlogDetais';
 
 @Injectable()
 export class BlogsRepository {
@@ -13,15 +14,23 @@ export class BlogsRepository {
     @InjectDataSource() private dataSource: DataSource,
   ) {}
 
-  public async get(id: string): Promise<BlogDocument | null> {
+  public async getBlogById(blogId: string): Promise<BlogDetails | null> {
     try {
-      const blog = await this.blogModel.findById(id).lean();
+      const blog = await this.dataSource.query(
+        `
+    SELECT *
+    FROM
+        blogs b
+     WHERE b.id = $1
+    `,
+        [blogId],
+      );
 
-      if (!blog) {
+      if (!blog.at(0)) {
         return null;
       }
 
-      return blog;
+      return blog.at(0);
     } catch (e) {
       return null;
     }
