@@ -105,11 +105,17 @@ export class BlogsRepository {
     }
   }
 
-  public async isBlogExist(userId: string): Promise<boolean> {
+  public async isBlogExist(blogId: string): Promise<boolean> {
     try {
-      const blog = await this.blogModel.countDocuments({ _id: userId }).lean();
+      const isBlogExist = await this.dataSource.query(
+        ` 
+    select 1 from blogs 
+    where id = $1
+    `,
+        [blogId],
+      );
 
-      return Boolean(blog);
+      return Boolean(isBlogExist.at(0));
     } catch (e) {
       return false;
     }

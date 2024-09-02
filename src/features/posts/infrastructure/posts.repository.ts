@@ -39,10 +39,27 @@ export class PostsRepository {
     }
   }
 
-  public async update(id: string, data: UpdatePostDto): Promise<boolean> {
-    const updateResult = await this.postModel.updateOne({ _id: id }, data);
+  public async update(postId: string, data: UpdatePostDto): Promise<boolean> {
+    try {
+      const updateResult = await this.dataSource.query(
+        `
+      UPDATE posts
+      SET title = $1, 
+          short_description = $2,
+          content = $3
+      WHERE id = $5 AND blog_id = $4
+      RETURNING id;
+      `,
+        [data.title, data.shortDescription, data.content, data.blogId, postId],
+      );
 
-    return updateResult.modifiedCount === 1;
+      return Boolean(updateResult.at(1));
+    } catch (e) {
+      console.error('Error updating post into database', {
+        error: e,
+      });
+      return false;
+    }
   }
 
   public async delete(id: string): Promise<boolean> {

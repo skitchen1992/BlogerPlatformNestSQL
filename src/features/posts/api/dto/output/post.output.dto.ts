@@ -31,7 +31,7 @@ export const PostOutputDtoMapper = (
   extendedLikesInfo: ExtendedLikesInfo,
 ): PostOutputDto => {
   const outputDto = new PostOutputDto();
-  console.log('postId', post, extendedLikesInfo);
+
   outputDto.id = post.id;
   outputDto.title = post.title;
   outputDto.shortDescription = post.short_description;
