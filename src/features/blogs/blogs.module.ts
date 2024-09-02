@@ -4,7 +4,6 @@ import { BlogsRepository } from '@features/blogs/infrastructure/blogs.repository
 import { BlogsQueryRepository } from '@features/blogs/infrastructure/blogs.query-repository';
 import { BlogsService } from '@features/blogs/application/blogs.service';
 import { CreateBlogHandler } from '@features/blogs/application/handlers/create-blog.handler';
-import { CreatePostForBlogHandler } from '@features/blogs/application/handlers/create-post-for-blog.handler';
 import { UpdateBlogHandler } from '@features/blogs/application/handlers/update-blog.handler';
 import { DeleteBlogHandler } from '@features/blogs/application/handlers/delete-blog.handler';
 import { GetAllHandler } from '@features/blogs/application/handlers/get-all.handler';
@@ -15,13 +14,16 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Blog, BlogSchema } from '@features/blogs/domain/blog-mongo.entity';
 import { PostsModule } from '@features/posts/posts.module';
 import { UsersModule } from '@features/users/users.module';
+import { CreatePostHandler } from '@features/posts/application/handlers/create-post.handler';
+import { UpdatePostHandler } from '@features/posts/application/handlers/update-post.handler';
 
 const blogsProviders: Provider[] = [
   BlogsRepository,
   BlogsQueryRepository,
   BlogsService,
   CreateBlogHandler,
-  CreatePostForBlogHandler,
+  CreatePostHandler,
+  UpdatePostHandler,
   UpdateBlogHandler,
   DeleteBlogHandler,
   GetAllHandler,
