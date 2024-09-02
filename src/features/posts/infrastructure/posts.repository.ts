@@ -5,6 +5,7 @@ import { UpdatePostDto } from '@features/posts/api/dto/input/update-post.input.d
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { Post } from '@features/posts/domain/post.entity';
+import { IUpdatePostDto } from '@features/posts/api/dto/update-post.dto';
 
 @Injectable()
 export class PostsRepository {
@@ -39,7 +40,11 @@ export class PostsRepository {
     }
   }
 
-  public async update(postId: string, data: UpdatePostDto): Promise<boolean> {
+  public async update(
+    postId: string,
+    blogId: string,
+    data: IUpdatePostDto,
+  ): Promise<boolean> {
     try {
       const updateResult = await this.dataSource.query(
         `
@@ -50,7 +55,7 @@ export class PostsRepository {
       WHERE id = $5 AND blog_id = $4
       RETURNING id;
       `,
-        [data.title, data.shortDescription, data.content, data.blogId, postId],
+        [data.title, data.shortDescription, data.content, blogId, postId],
       );
 
       return Boolean(updateResult.at(1));
