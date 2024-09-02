@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { PostModelType } from '../domain/post-mongo.entity';
-import { UpdatePostDto } from '@features/posts/api/dto/input/update-post.input.dto';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { Post } from '@features/posts/domain/post.entity';

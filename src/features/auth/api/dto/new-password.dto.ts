@@ -2,4 +2,4 @@ export class NewPasswordDto {}
 
 // MAPPERS
 
-export const NewPasswordDtoMapper = (password: string): void => {};
+export const NewPasswordDtoMapper = (): void => {};

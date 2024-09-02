@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { Post, PostModelType } from '../domain/post-mongo.entity';
 import { InjectModel } from '@nestjs/mongoose';
 import {
   ExtendedLikesInfo,
@@ -7,7 +6,6 @@ import {
   PostOutputDto,
   PostOutputDtoMapper,
 } from '../api/dto/output/post.output.dto';
-import { Pagination } from '@base/models/pagination.base.model';
 import {
   PostOutputPaginationDto,
   PostOutputPaginationDtoMapper,
@@ -23,16 +21,13 @@ import { NEWEST_LIKES_COUNT } from '@utils/consts';
 import { User, UserModelType } from '@features/users/domain/user-mongo.entity';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { BlogDetails } from '@features/blogs/api/dto/BlogDetais';
 import { PostDetails } from '@features/posts/api/dto/PostDetais';
 
 @Injectable()
 export class PostsQueryRepository {
   constructor(
-    @InjectModel(Post.name) private postModel: PostModelType,
     @InjectModel(User.name) private userModel: UserModelType,
     @InjectModel(Like.name) private likeModel: LikeModelType,
-    private readonly pagination: Pagination,
     @InjectDataSource() private dataSource: DataSource,
   ) {}
 
