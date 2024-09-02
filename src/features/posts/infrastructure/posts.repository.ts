@@ -66,9 +66,29 @@ export class PostsRepository {
     }
   }
 
-  public async delete(id: string): Promise<boolean> {
-    const deleteResult = await this.postModel.deleteOne({ _id: id });
+  public async delete(postId: string, blogId?: string): Promise<boolean> {
+    try {
+      const conditions: string[] = ['id = $1'];
+      const values: (string | undefined)[] = [postId];
 
-    return deleteResult.deletedCount === 1;
+      if (blogId) {
+        conditions.push('blog_id = $2');
+        values.push(blogId);
+      }
+
+      const result = await this.dataSource.query(
+        `
+      DELETE FROM posts 
+      WHERE ${conditions.join(' AND ')}
+      RETURNING *;
+      `,
+        values,
+      );
+
+      return Boolean(result.at(1));
+    } catch (e) {
+      console.error('Error during delete post operation:', e);
+      return false;
+    }
   }
 }

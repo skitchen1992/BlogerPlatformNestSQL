@@ -16,6 +16,7 @@ import { PostsModule } from '@features/posts/posts.module';
 import { UsersModule } from '@features/users/users.module';
 import { CreatePostHandler } from '@features/posts/application/handlers/create-post.handler';
 import { UpdatePostHandler } from '@features/posts/application/handlers/update-post.handler';
+import { DeletePostHandler } from '@features/posts/application/handlers/delete-post.handler';
 
 const blogsProviders: Provider[] = [
   BlogsRepository,
@@ -25,6 +26,7 @@ const blogsProviders: Provider[] = [
   CreatePostHandler,
   UpdatePostHandler,
   UpdateBlogHandler,
+  DeletePostHandler,
   DeleteBlogHandler,
   GetAllHandler,
   GetPostForBlogHandler,

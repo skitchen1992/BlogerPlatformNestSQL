@@ -37,8 +37,8 @@ import { Request } from 'express';
 import { SkipThrottle } from '@nestjs/throttler';
 import { CreatePostCommand } from '@features/posts/application/handlers/create-post.handler';
 import { UpdatePostCommand } from '@features/posts/application/handlers/update-post.handler';
-import { UpdatePostDto } from '@features/posts/api/dto/input/update-post.input.dto';
 import { UpdatePostForBlogDto } from '@features/blogs/api/dto/input/update-post-for-blog.input.dto';
+import { DeletePostCommand } from '@features/posts/application/handlers/delete-post.handler';
 
 // Tag для swagger
 @SkipThrottle()
@@ -119,6 +119,19 @@ export class BlogsController {
 
     await this.commandBus.execute<UpdatePostCommand, void>(
       new UpdatePostCommand(postId, title, shortDescription, content, blogId),
+    );
+  }
+
+  @ApiSecurity('basic')
+  @UseGuards(BasicAuthGuard)
+  @Delete(':blogId/posts/:postId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deletePostForBlog(
+    @Param('blogId') blogId: string,
+    @Param('postId') postId: string,
+  ) {
+    await this.commandBus.execute<DeletePostCommand, void>(
+      new DeletePostCommand(postId, blogId),
     );
   }
 
