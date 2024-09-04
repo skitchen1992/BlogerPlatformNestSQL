@@ -1,5 +1,5 @@
 import { ApiTags } from '@nestjs/swagger';
-import { Controller, Get, Param, Query, Req } from '@nestjs/common';
+import { Controller, Get, Param, Query, Req, UseGuards } from '@nestjs/common';
 import { UsersQuery } from '@features/users/api/dto/output/user.output.pagination.dto';
 import {
   PostOutputPaginationDto,
@@ -12,6 +12,7 @@ import { GetPostForBlogQuery } from '@features/blogs/application/handlers/get-po
 import { GetBlogQuery } from '@features/blogs/application/handlers/get-blog.handler';
 import { Request } from 'express';
 import { SkipThrottle } from '@nestjs/throttler';
+import { BearerTokenInterceptorGuard } from '@infrastructure/guards/bearer-token-interceptor-guard.service';
 
 // Tag для swagger
 @SkipThrottle()
@@ -27,6 +28,7 @@ export class BlogsController {
     );
   }
 
+  @UseGuards(BearerTokenInterceptorGuard)
   @Get(':blogId/posts')
   async getPostsForBlog(
     @Param('blogId') blogId: string,

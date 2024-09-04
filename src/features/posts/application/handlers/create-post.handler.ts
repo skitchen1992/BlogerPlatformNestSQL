@@ -2,7 +2,6 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { PostsRepository } from '@features/posts/infrastructure/posts.repository';
 import { BlogsRepository } from '@features/blogs/infrastructure/blogs.repository';
 import { NotFoundException } from '@nestjs/common';
-import { Post } from '@features/posts/domain/post.entity';
 import { NewPostDto } from '@features/posts/api/dto/new-post.dto';
 
 export class CreatePostCommand {

@@ -42,7 +42,10 @@ export class PostsQueryRepository {
       [postId],
     );
 
-    return result.at(0);
+    return {
+      likes_count: Number(result.at(0).likes_count),
+      dislikes_count: Number(result.at(0).dislikes_count),
+    };
   }
 
   private async getUserLikeStatus(

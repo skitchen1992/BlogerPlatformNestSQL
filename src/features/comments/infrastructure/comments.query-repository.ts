@@ -89,7 +89,10 @@ export class CommentsQueryRepository {
       [commentId],
     );
 
-    return result.at(0);
+    return {
+      likes_count: Number(result.at(0).likes_count),
+      dislikes_count: Number(result.at(0).dislikes_count),
+    };
   }
 
   public async getById(

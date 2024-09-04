@@ -13,7 +13,6 @@ import { SharedService } from '@infrastructure/servises/shared/shared.service';
 import { SessionsRepository } from '@features/session/infrastructure/sessions.repository';
 import { ConfigService } from '@nestjs/config';
 import { ConfigurationType } from '@settings/configuration';
-import { Session } from '@features/session/domain/session.entity';
 import { NewSessionDto } from '@features/session/api/dto/new-session.dto';
 
 export class LoginCommand {
