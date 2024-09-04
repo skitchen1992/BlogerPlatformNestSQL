@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { Comment } from '../domain/comment.entity';
-import { InjectModel } from '@nestjs/mongoose';
 import {
   CommentOutputDto,
   CommentOutputDtoMapper,
@@ -11,21 +10,13 @@ import {
   CommentOutputPaginationDtoMapper,
   CommentQuery,
 } from '@features/comments/api/dto/output/comment.output.pagination.dto';
-import {
-  Like,
-  LikeModelType,
-  LikeStatusEnum,
-  ParentTypeEnum,
-} from '@features/likes/domain/likes-mongo.entity';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
+import { LikeStatusEnum } from '@features/likes/domain/likes.entity';
 
 @Injectable()
 export class CommentsQueryRepository {
-  constructor(
-    @InjectModel(Like.name) private likeModel: LikeModelType,
-    @InjectDataSource() private dataSource: DataSource,
-  ) {}
+  constructor(@InjectDataSource() private dataSource: DataSource) {}
 
   private async getLikesInfoForAuthUser(
     commentId: string,
@@ -35,8 +26,8 @@ export class CommentsQueryRepository {
     const likeStatus = await this.getUserLikeStatus(commentId, userId);
 
     return {
-      likesCount: likeDislikeCounts.likesCount,
-      dislikesCount: likeDislikeCounts.dislikesCount,
+      likesCount: likeDislikeCounts.likes_count,
+      dislikesCount: likeDislikeCounts.dislikes_count,
       myStatus: likeStatus,
     };
   }
@@ -48,8 +39,8 @@ export class CommentsQueryRepository {
     const likeStatus = await this.getUserLikeStatus(commentId, '');
 
     return {
-      likesCount: likeDislikeCounts.likesCount,
-      dislikesCount: likeDislikeCounts.dislikesCount,
+      likesCount: likeDislikeCounts.likes_count,
+      dislikesCount: likeDislikeCounts.dislikes_count,
       myStatus: likeStatus,
     };
   }
@@ -58,38 +49,47 @@ export class CommentsQueryRepository {
     commentId: string,
     userId: string,
   ): Promise<LikeStatusEnum> {
-    const user = await this.likeModel
-      .findOne({
-        parentId: commentId,
-        parentType: ParentTypeEnum.COMMENT,
-        authorId: userId,
-      })
-      .lean();
+    if (!userId) {
+      return LikeStatusEnum.NONE;
+    }
 
-    return user?.status || LikeStatusEnum.NONE;
+    const result = await this.dataSource.query(
+      `
+    SELECT status
+    FROM likes
+    WHERE parent_id = $1
+      AND parent_type = 'Comment'
+      AND author_id = $2
+    LIMIT 1;
+    `,
+      [commentId, userId],
+    );
+
+    return result?.at(0)?.status || LikeStatusEnum.NONE;
   }
 
   private async getLikeDislikeCounts(
     commentId: string,
-  ): Promise<{ likesCount: number; dislikesCount: number }> {
-    const result = await this.likeModel.aggregate([
-      { $match: { parentId: commentId, parentType: ParentTypeEnum.COMMENT } },
-      {
-        $group: {
-          _id: null,
-          likesCount: {
-            $sum: { $cond: [{ $eq: ['$status', LikeStatusEnum.LIKE] }, 1, 0] },
-          },
-          dislikesCount: {
-            $sum: {
-              $cond: [{ $eq: ['$status', LikeStatusEnum.DISLIKE] }, 1, 0],
-            },
-          },
-        },
-      },
-    ]);
+  ): Promise<{ likes_count: number; dislikes_count: number }> {
+    const result = await this.dataSource.query(
+      `
+    WITH counts AS (
+        SELECT 
+            COUNT(CASE WHEN status = 'Like' THEN 1 END) AS likes_count,
+            COUNT(CASE WHEN status = 'Dislike' THEN 1 END) AS dislikes_count
+        FROM likes
+        WHERE parent_id = $1
+          AND parent_type = 'Comment'
+    )
+    SELECT 
+        COALESCE(likes_count, 0) AS likes_count,
+        COALESCE(dislikes_count, 0) AS dislikes_count
+    FROM counts;
+    `,
+      [commentId],
+    );
 
-    return result.length ? result[0] : { likesCount: 0, dislikesCount: 0 };
+    return result.at(0);
   }
 
   public async getById(
@@ -129,17 +129,6 @@ export class CommentsQueryRepository {
     params?: { postId: string },
     userId?: string,
   ): Promise<CommentOutputPaginationDto> {
-    // const pagination = this.pagination.getComments(query, params);
-    //
-    // const comments = await this.commentModel
-    //   .find(pagination.query)
-    //   .sort(pagination.sort)
-    //   .skip(pagination.skip)
-    //   .limit(pagination.pageSize)
-    //   .lean();
-    //
-    // const totalCount = await this.commentModel.countDocuments(pagination.query);
-
     const {
       sortBy = 'createdAt',
       sortDirection = 'desc',
