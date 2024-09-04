@@ -1,10 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import {
-  Comment,
-  CommentDocument,
-  CommentModelType,
-} from '../domain/comment-mongo.entity';
+import { CommentModelType } from '../domain/comment-mongo.entity';
+
+import { Comment } from '../domain/comment.entity';
 import { UpdateCommentDto } from '@features/comments/api/dto/input/update-comment.input.dto';
 import { NewComment } from '@features/comments/api/dto/new-comment.dto';
 import { InjectDataSource } from '@nestjs/typeorm';
@@ -17,9 +15,18 @@ export class CommentsRepository {
     @InjectDataSource() private dataSource: DataSource,
   ) {}
 
-  public async get(id: string): Promise<CommentDocument | null> {
+  public async getById(commentId: string): Promise<Comment | null> {
     try {
-      const comment = await this.commentsModel.findById(id).lean();
+      const commentList: Comment[] = await this.dataSource.query(
+        `
+    SELECT *
+    FROM comments c
+    WHERE c.id = $1
+    `,
+        [commentId],
+      );
+
+      const comment = commentList.at(0);
 
       if (!comment) {
         return null;
@@ -56,15 +63,26 @@ export class CommentsRepository {
     }
   }
 
-  public async update(id: string, data: UpdateCommentDto): Promise<boolean> {
+  public async update(
+    commentId: string,
+    data: UpdateCommentDto,
+  ): Promise<boolean> {
     try {
-      const updateResult = await this.commentsModel.updateOne(
-        { _id: id },
-        data,
+      const updateResult = await this.dataSource.query(
+        `
+      UPDATE comments
+      SET content = $1 
+      WHERE id = $2
+      RETURNING id;
+      `,
+        [data.content, commentId],
       );
 
-      return updateResult.modifiedCount === 1;
+      return Boolean(updateResult.at(1));
     } catch (e) {
+      console.error('Error updating comment into database', {
+        error: e,
+      });
       return false;
     }
   }

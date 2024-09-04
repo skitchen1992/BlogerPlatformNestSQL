@@ -19,13 +19,13 @@ export class UpdateCommentHandler
   async execute(command: UpdateCommentCommand): Promise<void> {
     const { content, commentId, userId } = command;
 
-    const comment = await this.commentsRepository.get(commentId);
+    const comment = await this.commentsRepository.getById(commentId);
 
     if (!comment) {
       throw new NotFoundException(`Comment with id ${commentId} not found`);
     }
 
-    if (userId !== comment.commentatorInfo.userId.toString()) {
+    if (userId !== comment.user_id) {
       throw new ForbiddenException(
         'You do not have permission to perform this action.',
       );
