@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { User } from '@features/users/domain/user.entity';
 import { EmailConfirmation } from '@features/users/domain/emailConfirmation.entity';
 import { RecoveryCodeDto } from '@features/auth/api/dto/recovery-code.dto';
 import { UserJoined } from '@features/users/api/dto/User-joined.dto';

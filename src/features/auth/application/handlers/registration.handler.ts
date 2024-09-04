@@ -4,7 +4,6 @@ import { BadRequestException } from '@nestjs/common';
 import { add, getCurrentISOStringDate } from '@utils/dates';
 import { getUniqueId } from '@utils/utils';
 import { SharedService } from '@infrastructure/servises/shared/shared.service';
-import { User } from '@features/users/domain/user.entity';
 import { EmailConfirmation } from '@features/users/domain/emailConfirmation.entity';
 import { NewUserDto } from '@features/users/api/dto/new-user.dto';
 

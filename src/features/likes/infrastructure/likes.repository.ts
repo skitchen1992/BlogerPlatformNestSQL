@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { LikeModelType } from '../domain/likes-mongo.entity';
 import { Like, LikeStatusEnum, ParentTypeEnum } from '../domain/likes.entity';
-import { UpdateQuery } from 'mongoose';
 import { ObjectId } from 'mongodb';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
