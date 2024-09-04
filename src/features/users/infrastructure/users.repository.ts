@@ -4,13 +4,13 @@ import { DataSource } from 'typeorm';
 import { User } from '@features/users/domain/user.entity';
 import { EmailConfirmation } from '@features/users/domain/emailConfirmation.entity';
 import { RecoveryCodeDto } from '@features/auth/api/dto/recovery-code.dto';
-import { UserDetails } from '@features/users/api/dto/UserDetais';
+import { UserJoined } from '@features/users/api/dto/User-joined.dto';
 
 @Injectable()
 export class UsersRepository {
   constructor(@InjectDataSource() private dataSource: DataSource) {}
 
-  public async getUserById(userId: string): Promise<UserDetails | null> {
+  public async getUserById(userId: string): Promise<UserJoined | null> {
     try {
       const user = await this.dataSource.query(
         `
@@ -233,7 +233,7 @@ export class UsersRepository {
     login: string,
     email: string,
   ): Promise<{
-    user: UserDetails | null;
+    user: UserJoined | null;
     foundBy: string | null;
   }> {
     const user = await this.dataSource.query(
@@ -273,7 +273,7 @@ export class UsersRepository {
 
   public async getUserByConfirmationCode(
     confirmationCode: string,
-  ): Promise<UserDetails | null> {
+  ): Promise<UserJoined | null> {
     const user = await this.dataSource.query(
       `
     SELECT

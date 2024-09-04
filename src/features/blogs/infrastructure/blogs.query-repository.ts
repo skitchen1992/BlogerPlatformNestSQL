@@ -10,7 +10,7 @@ import {
 } from '@features/blogs/api/dto/output/blog.output.pagination.dto';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { BlogDetails } from '@features/blogs/api/dto/BlogDetais';
+import { Blog } from '@features/blogs/domain/blog.entity';
 
 @Injectable()
 export class BlogsQueryRepository {
@@ -66,7 +66,7 @@ export class BlogsQueryRepository {
 
     const collateClause = sortField === 'name' ? 'COLLATE "C"' : '';
 
-    const blogs: BlogDetails[] = await this.dataSource.query(
+    const blogs: Blog[] = await this.dataSource.query(
       `
     SELECT *
     FROM

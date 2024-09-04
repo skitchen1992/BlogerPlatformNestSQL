@@ -5,7 +5,7 @@ import { Blog } from '@features/blogs/domain/blog.entity';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { UpdateBlogDto } from '@features/blogs/api/dto/input/update-blog.input.dto';
-import { BlogDetails } from '@features/blogs/api/dto/BlogDetais';
+import { NewBlogDto } from '@features/blogs/api/dto/new-blog.dto';
 
 @Injectable()
 export class BlogsRepository {
@@ -14,7 +14,7 @@ export class BlogsRepository {
     @InjectDataSource() private dataSource: DataSource,
   ) {}
 
-  public async getBlogById(blogId: string): Promise<BlogDetails | null> {
+  public async getBlogById(blogId: string): Promise<Blog | null> {
     try {
       const blog = await this.dataSource.query(
         `
@@ -36,7 +36,7 @@ export class BlogsRepository {
     }
   }
 
-  public async create(newBlog: Blog): Promise<string> {
+  public async create(newBlog: NewBlogDto): Promise<string> {
     try {
       const result = await this.dataSource.query(
         `
@@ -47,8 +47,8 @@ export class BlogsRepository {
         [
           newBlog.name,
           newBlog.description,
-          newBlog.website_url,
-          newBlog.is_membership,
+          newBlog.websiteUrl,
+          newBlog.isMembership,
         ],
       );
 

@@ -2,14 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { AllDevicesOutputDtoMapper } from '@features/session/api/dto/output/allDevices.output.dto';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { SessionDetails } from '@features/session/api/dto/SessionDetais';
+import { Session } from '@features/session/domain/session.entity';
 
 @Injectable()
 export class SessionsQueryRepository {
   constructor(@InjectDataSource() private dataSource: DataSource) {}
 
   async getDeviceListByUserId(userId: string) {
-    const sessions: SessionDetails[] = await this.dataSource.query(
+    const sessions: Session[] = await this.dataSource.query(
       `
       SELECT * FROM sessions s
       WHERE s.user_id = $1

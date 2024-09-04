@@ -1,4 +1,4 @@
-import { SessionDetails } from '@features/session/api/dto/SessionDetais';
+import { Session } from '@features/session/domain/session.entity';
 
 export class AllDevicesOutputDto {
   ip: string;
@@ -10,7 +10,7 @@ export class AllDevicesOutputDto {
 // MAPPERS
 
 export const AllDevicesOutputDtoMapper = (
-  session: SessionDetails,
+  session: Session,
 ): AllDevicesOutputDto => {
   const outputDto = new AllDevicesOutputDto();
 

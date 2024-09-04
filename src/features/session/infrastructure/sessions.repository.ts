@@ -5,7 +5,7 @@ import { UpdateQuery } from 'mongoose';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { Session } from '@features/session/domain/session.entity';
-import { SessionDetails } from '@features/session/api/dto/SessionDetais';
+import { NewSessionDto } from '@features/session/api/dto/new-session.dto';
 
 @Injectable()
 export class SessionsRepository {
@@ -14,9 +14,7 @@ export class SessionsRepository {
     @InjectDataSource() private dataSource: DataSource,
   ) {}
 
-  public async getSessionByDeviceId(
-    deviceId: string,
-  ): Promise<SessionDetails | null> {
+  public async getSessionByDeviceId(deviceId: string): Promise<Session | null> {
     try {
       const devise = await this.dataSource.query(
         `
@@ -36,7 +34,7 @@ export class SessionsRepository {
     }
   }
 
-  public async create(newSession: Session): Promise<string> {
+  public async create(newSession: NewSessionDto): Promise<string> {
     try {
       const result = await this.dataSource.query(
         `
@@ -45,13 +43,13 @@ export class SessionsRepository {
       RETURNING id;
     `,
         [
-          newSession.user_id,
+          newSession.userId,
           newSession.ip,
           newSession.title,
-          newSession.last_active_date,
-          newSession.token_issue_date,
-          newSession.token_expiration_date,
-          newSession.device_id,
+          newSession.lastActiveDate,
+          newSession.tokenIssueDate,
+          newSession.tokenExpirationDate,
+          newSession.deviceId,
         ],
       );
 

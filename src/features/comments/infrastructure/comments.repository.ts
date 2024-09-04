@@ -6,11 +6,15 @@ import {
   CommentModelType,
 } from '../domain/comment-mongo.entity';
 import { UpdateCommentDto } from '@features/comments/api/dto/input/update-comment.input.dto';
+import { NewComment } from '@features/comments/api/dto/new-comment.dto';
+import { InjectDataSource } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
 
 @Injectable()
 export class CommentsRepository {
   constructor(
     @InjectModel(Comment.name) private commentsModel: CommentModelType,
+    @InjectDataSource() private dataSource: DataSource,
   ) {}
 
   public async get(id: string): Promise<CommentDocument | null> {
@@ -27,10 +31,29 @@ export class CommentsRepository {
     }
   }
 
-  public async create(newComment: Comment): Promise<string> {
-    const insertResult = await this.commentsModel.insertMany([newComment]);
+  public async create(newComment: NewComment): Promise<string> {
+    try {
+      const result = await this.dataSource.query(
+        `
+      INSERT INTO comments (content, user_id, user_login, post_id)
+      VALUES ($1, $2, $3, $4)
+      RETURNING id;
+    `,
+        [
+          newComment.content,
+          newComment.userId,
+          newComment.userLogin,
+          newComment.postId,
+        ],
+      );
 
-    return insertResult[0].id;
+      return result[0].id;
+    } catch (e) {
+      console.error('Error inserting comment into database', {
+        error: e,
+      });
+      return '';
+    }
   }
 
   public async update(id: string, data: UpdateCommentDto): Promise<boolean> {

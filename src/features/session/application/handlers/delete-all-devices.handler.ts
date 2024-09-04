@@ -5,7 +5,7 @@ import { CookieService } from '@infrastructure/servises/cookie/cookie.service';
 import { UnauthorizedException } from '@nestjs/common';
 import { SessionsRepository } from '@features/session/infrastructure/sessions.repository';
 import { SharedService } from '@infrastructure/servises/shared/shared.service';
-import { Session } from '@features/session/domain/session.entity';
+import { NewSessionDto } from '@features/session/api/dto/new-session.dto';
 
 export class DeleteAllDevicesCommand {
   constructor(
@@ -50,14 +50,14 @@ export class DeleteAllDevicesHandler
 
     await this.sessionsRepository.deleteSessionListByUserId(session.user_id);
 
-    const newSession: Session = {
-      user_id: session.user_id,
+    const newSession: NewSessionDto = {
+      userId: session.user_id,
       ip: session.ip,
       title: session.title,
-      last_active_date: session.last_active_date,
-      token_issue_date: session.token_issue_date,
-      token_expiration_date: session.token_expiration_date,
-      device_id: session.device_id,
+      lastActiveDate: session.last_active_date,
+      tokenIssueDate: session.token_issue_date,
+      tokenExpirationDate: session.token_expiration_date,
+      deviceId: deviceId,
     };
 
     await this.sessionsRepository.create(newSession);

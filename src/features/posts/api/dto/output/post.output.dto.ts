@@ -1,5 +1,5 @@
 import { LikeStatusEnum } from '@features/likes/domain/likes.entity';
-import { PostDetails } from '@features/posts/api/dto/PostDetais';
+import { Post } from '@features/posts/domain/post.entity';
 
 export type NewestLike = {
   addedAt: string;
@@ -27,7 +27,7 @@ export class PostOutputDto {
 // MAPPERS
 
 export const PostOutputDtoMapper = (
-  post: PostDetails,
+  post: Post,
   extendedLikesInfo: ExtendedLikesInfo,
 ): PostOutputDto => {
   const outputDto = new PostOutputDto();

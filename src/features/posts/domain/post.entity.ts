@@ -13,7 +13,7 @@ import { Comment } from '@features/comments/domain/comment.entity';
 @Entity('posts')
 export class Post {
   @PrimaryGeneratedColumn('uuid')
-  id?: string;
+  id: string;
 
   @Column({ type: 'varchar', length: 30, nullable: false, name: 'title' })
   title: string;
@@ -39,7 +39,7 @@ export class Post {
     nullable: false,
     default: () => 'CURRENT_TIMESTAMP',
   })
-  created_at?: Date;
+  created_at: Date;
 
   @ManyToOne(() => Blog, (blog) => blog.posts, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'blog_id' }) // Используем нотацию через нижнее подчеркивание

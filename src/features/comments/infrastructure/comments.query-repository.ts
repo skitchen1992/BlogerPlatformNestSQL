@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { Comment, CommentModelType } from '../domain/comment-mongo.entity';
+import { CommentModelType } from '../domain/comment-mongo.entity';
+import { Comment } from '../domain/comment.entity';
 import { InjectModel } from '@nestjs/mongoose';
 import {
   CommentOutputDto,
@@ -18,6 +19,9 @@ import {
   LikeStatusEnum,
   ParentTypeEnum,
 } from '@features/likes/domain/likes.entity';
+import { InjectDataSource } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
+import { Post } from '@features/posts/domain/post.entity';
 
 @Injectable()
 export class CommentsQueryRepository {
@@ -25,6 +29,7 @@ export class CommentsQueryRepository {
     @InjectModel(Comment.name) private commentModel: CommentModelType,
     @InjectModel(Like.name) private likeModel: LikeModelType,
     private readonly pagination: Pagination,
+    @InjectDataSource() private dataSource: DataSource,
   ) {}
 
   private async getLikesInfoForAuthUser(
@@ -97,7 +102,16 @@ export class CommentsQueryRepository {
     userId?: string,
   ): Promise<CommentOutputDto | null> {
     try {
-      const comment = await this.commentModel.findById(commentId).lean();
+      const commentList: Comment[] = await this.dataSource.query(
+        `
+    SELECT *
+    FROM comments c
+    WHERE c.id = $1
+    `,
+        [commentId],
+      );
+
+      const comment = commentList.at(0);
 
       if (!comment) {
         return null;
@@ -120,39 +134,90 @@ export class CommentsQueryRepository {
     params?: { postId: string },
     userId?: string,
   ): Promise<CommentOutputPaginationDto> {
-    const pagination = this.pagination.getComments(query, params);
+    // const pagination = this.pagination.getComments(query, params);
+    //
+    // const comments = await this.commentModel
+    //   .find(pagination.query)
+    //   .sort(pagination.sort)
+    //   .skip(pagination.skip)
+    //   .limit(pagination.pageSize)
+    //   .lean();
+    //
+    // const totalCount = await this.commentModel.countDocuments(pagination.query);
 
-    const comments = await this.commentModel
-      .find(pagination.query)
-      .sort(pagination.sort)
-      .skip(pagination.skip)
-      .limit(pagination.pageSize)
-      .lean();
+    const {
+      sortBy = 'createdAt',
+      sortDirection = 'desc',
+      pageNumber = 1,
+      pageSize = 10,
+    } = query;
 
-    const totalCount = await this.commentModel.countDocuments(pagination.query);
+    const validSortDirections = ['asc', 'desc'];
+    const direction = validSortDirections.includes(sortDirection)
+      ? sortDirection
+      : 'desc';
+
+    const sortField = sortBy === 'userLogin' ? 'user_login' : 'created_at';
+
+    let whereConditions = '';
+    const queryParams: any[] = [];
+
+    if (params?.postId) {
+      whereConditions = `post_id = $1`;
+      queryParams.push(params.postId);
+    } else {
+      whereConditions = 'TRUE';
+    }
+
+    const collateClause = sortField === 'user_login' ? 'COLLATE "C"' : '';
+
+    const comments: Comment[] = await this.dataSource.query(
+      `
+    SELECT *
+    FROM
+        comments
+    WHERE
+        ${whereConditions}
+    ORDER BY
+        ${sortField} ${collateClause} ${direction}
+    LIMIT $${queryParams.length + 1}
+    OFFSET $${queryParams.length + 2} * ($${queryParams.length + 3} - 1);
+    `,
+      [
+        ...queryParams,
+        pageSize, // LIMIT
+        pageSize, // OFFSET calculation
+        pageNumber, // used for OFFSET
+      ],
+    );
 
     const commentList = await Promise.all(
       comments.map(async (comment) => {
         if (userId) {
-          const like = await this.getLikesInfoForAuthUser(
-            comment._id.toString(),
-            userId,
-          );
+          const like = await this.getLikesInfoForAuthUser(comment.id, userId);
           return CommentOutputDtoMapper(comment, like);
         } else {
-          const like = await this.getLikesInfoForNotAuthUser(
-            comment._id.toString(),
-          );
+          const like = await this.getLikesInfoForNotAuthUser(comment.id);
           return CommentOutputDtoMapper(comment, like);
         }
       }),
     );
 
+    const totalCount = await this.dataSource.query(
+      `
+    SELECT COUNT(*)::int AS count
+    FROM comments
+    WHERE
+        ${whereConditions}
+    `,
+      queryParams,
+    );
+
     return CommentOutputPaginationDtoMapper(
       commentList,
-      totalCount,
-      pagination.pageSize,
-      pagination.page,
+      totalCount.at(0).count,
+      Number(pageSize),
+      Number(pageNumber),
     );
   }
 }

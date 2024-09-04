@@ -14,6 +14,7 @@ import { SessionsRepository } from '@features/session/infrastructure/sessions.re
 import { ConfigService } from '@nestjs/config';
 import { ConfigurationType } from '@settings/configuration';
 import { Session } from '@features/session/domain/session.entity';
+import { NewSessionDto } from '@features/session/api/dto/new-session.dto';
 
 export class LoginCommand {
   constructor(
@@ -69,15 +70,15 @@ export class LoginHandler
     const userAgentHeader = req.headers['user-agent'] || 'unknown';
     const ipAddress = req.ip || 'unknown';
 
-    const newSession: Session = {
-      user_id: userId,
+    const newSession: NewSessionDto = {
+      userId,
       ip: ipAddress,
       title: userAgentHeader,
-      last_active_date: new Date(),
-      token_issue_date: new Date(),
-      token_expiration_date:
+      lastActiveDate: new Date(),
+      tokenIssueDate: new Date(),
+      tokenExpirationDate:
         this.sharedService.getTokenExpirationDate(refreshToken)!,
-      device_id: deviceId,
+      deviceId: deviceId,
     };
 
     await this.sessionsRepository.create(newSession);

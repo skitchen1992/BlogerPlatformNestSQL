@@ -4,7 +4,7 @@ import { Post } from '@features/posts/domain/post.entity';
 @Entity('blogs')
 export class Blog {
   @PrimaryGeneratedColumn('uuid')
-  id?: string;
+  id: string;
 
   @Column({ type: 'varchar', length: 15 })
   name: string;
@@ -16,7 +16,7 @@ export class Blog {
   website_url: string;
 
   @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
-  created_at?: Date;
+  created_at: Date;
 
   @Column({ type: 'boolean' })
   is_membership: boolean;

@@ -1,7 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CommentsRepository } from '@features/comments/infrastructure/comments.repository';
-import { Comment } from '@features/comments/domain/comment-mongo.entity';
-import { getCurrentISOStringDate } from '@utils/dates';
+import { NewComment } from '@features/comments/api/dto/new-comment.dto';
 
 export class CreateCommentCommand {
   constructor(
@@ -20,14 +19,11 @@ export class CreateCommentHandler
   async execute(command: CreateCommentCommand): Promise<string> {
     const { content, userId, userLogin, postId } = command;
 
-    const newComment: Comment = {
+    const newComment: NewComment = {
       content,
-      commentatorInfo: {
-        userId,
-        userLogin,
-      },
+      userId,
+      userLogin,
       postId,
-      createdAt: getCurrentISOStringDate(),
     };
 
     return await this.commentsRepository.create(newComment);

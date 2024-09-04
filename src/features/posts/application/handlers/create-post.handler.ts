@@ -3,6 +3,7 @@ import { PostsRepository } from '@features/posts/infrastructure/posts.repository
 import { BlogsRepository } from '@features/blogs/infrastructure/blogs.repository';
 import { NotFoundException } from '@nestjs/common';
 import { Post } from '@features/posts/domain/post.entity';
+import { NewPostDto } from '@features/posts/api/dto/new-post.dto';
 
 export class CreatePostCommand {
   constructor(
@@ -30,12 +31,12 @@ export class CreatePostHandler
       throw new NotFoundException(`Blog with id ${blogId} not found`);
     }
 
-    const newPost: Post = {
+    const newPost: NewPostDto = {
       title,
-      short_description: shortDescription,
+      shortDescription,
       content,
-      blog_id: blogId,
-      blog_name: blog.name,
+      blogId,
+      blogName: blog.name,
     };
 
     return await this.postsRepository.create(newPost);

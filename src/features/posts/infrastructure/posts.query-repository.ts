@@ -21,7 +21,7 @@ import { NEWEST_LIKES_COUNT } from '@utils/consts';
 import { User, UserModelType } from '@features/users/domain/user-mongo.entity';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { PostDetails } from '@features/posts/api/dto/PostDetais';
+import { Post } from '@features/posts/domain/post.entity';
 
 @Injectable()
 export class PostsQueryRepository {
@@ -187,7 +187,7 @@ export class PostsQueryRepository {
 
     const collateClause = sortField === 'blog_name' ? 'COLLATE "C"' : '';
 
-    const posts: PostDetails[] = await this.dataSource.query(
+    const posts: Post[] = await this.dataSource.query(
       `
     SELECT *
     FROM

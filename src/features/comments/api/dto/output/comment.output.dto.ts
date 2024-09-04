@@ -1,5 +1,5 @@
-import { CommentDocument } from '../../../domain/comment-mongo.entity';
 import { LikeStatusEnum } from '@features/likes/domain/likes.entity';
+import { Comment } from '@features/comments/domain/comment.entity';
 
 export interface ILikesInfo {
   likesCount: number;
@@ -21,18 +21,18 @@ export class CommentOutputDto {
 // MAPPERS
 
 export const CommentOutputDtoMapper = (
-  comment: CommentDocument,
+  comment: Comment,
   likesInfo: ILikesInfo,
 ): CommentOutputDto => {
   const outputDto = new CommentOutputDto();
 
-  outputDto.id = comment._id.toString();
+  outputDto.id = comment.id;
   outputDto.content = comment.content;
   outputDto.commentatorInfo = {
-    userId: comment.commentatorInfo.userId,
-    userLogin: comment.commentatorInfo.userLogin,
+    userId: comment.user_id,
+    userLogin: comment.user_login,
   };
-  outputDto.createdAt = comment.createdAt;
+  outputDto.createdAt = comment.created_at.toISOString();
   outputDto.likesInfo = likesInfo;
 
   return outputDto;
