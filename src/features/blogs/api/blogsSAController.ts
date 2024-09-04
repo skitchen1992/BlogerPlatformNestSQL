@@ -32,7 +32,6 @@ import { GetPostForBlogQuery } from '@features/blogs/application/handlers/get-po
 import { GetBlogQuery } from '@features/blogs/application/handlers/get-blog.handler';
 import { BasicAuthGuard } from '@infrastructure/guards/basic-auth-guard.service';
 import { GetPostQuery } from '@features/posts/application/handlers/get-post.handler';
-import { BearerTokenInterceptorGuard } from '@infrastructure/guards/bearer-token-interceptor-guard.service';
 import { Request } from 'express';
 import { SkipThrottle } from '@nestjs/throttler';
 import { CreatePostCommand } from '@features/posts/application/handlers/create-post.handler';
@@ -43,13 +42,15 @@ import { DeletePostCommand } from '@features/posts/application/handlers/delete-p
 // Tag для swagger
 @SkipThrottle()
 @ApiTags('Blogs')
-@Controller('blogs')
-export class BlogsController {
+@Controller('sa/blogs')
+export class BlogsSAController {
   constructor(
     private readonly commandBus: CommandBus,
     private readonly queryBus: QueryBus,
   ) {}
 
+  @ApiSecurity('basic')
+  @UseGuards(BasicAuthGuard)
   @Get()
   async getAll(@Query() query: UsersQuery) {
     return await this.queryBus.execute<GetAllQuery, BlogOutputPaginationDto>(
@@ -73,7 +74,10 @@ export class BlogsController {
     );
   }
 
-  @UseGuards(BearerTokenInterceptorGuard)
+  // @ApiSecurity('bearer')
+  // @UseGuards(BearerTokenInterceptorGuard)
+  @ApiSecurity('basic')
+  @UseGuards(BasicAuthGuard)
   @Get(':blogId/posts')
   async getPostsForBlog(
     @Param('blogId') blogId: string,
@@ -110,6 +114,7 @@ export class BlogsController {
   @ApiSecurity('basic')
   @UseGuards(BasicAuthGuard)
   @Put(':blogId/posts/:postId')
+  @HttpCode(HttpStatus.NO_CONTENT)
   async updatePostForBlog(
     @Param('blogId') blogId: string,
     @Param('postId') postId: string,

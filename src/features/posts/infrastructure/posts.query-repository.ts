@@ -173,8 +173,7 @@ export class PostsQueryRepository {
       ? sortDirection
       : 'desc';
 
-    const validSortFields = ['created_at'];
-    const sortField = validSortFields.includes(sortBy) ? sortBy : 'created_at';
+    const sortField = sortBy === 'blogName' ? 'blog_name' : 'created_at';
 
     let whereConditions = '';
     const queryParams: any[] = [];
@@ -186,6 +185,8 @@ export class PostsQueryRepository {
       whereConditions = 'TRUE';
     }
 
+    const collateClause = sortField === 'blog_name' ? 'COLLATE "C"' : '';
+
     const posts: PostDetails[] = await this.dataSource.query(
       `
     SELECT *
@@ -194,7 +195,7 @@ export class PostsQueryRepository {
     WHERE
         ${whereConditions}
     ORDER BY
-        ${sortField} ${direction}
+        ${sortField} ${collateClause} ${direction}
     LIMIT $${queryParams.length + 1}
     OFFSET $${queryParams.length + 2} * ($${queryParams.length + 3} - 1);
     `,

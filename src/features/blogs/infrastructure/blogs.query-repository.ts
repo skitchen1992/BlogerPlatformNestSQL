@@ -64,6 +64,8 @@ export class BlogsQueryRepository {
       whereConditions = 'TRUE';
     }
 
+    const collateClause = sortField === 'name' ? 'COLLATE "C"' : '';
+
     const blogs: BlogDetails[] = await this.dataSource.query(
       `
     SELECT *
@@ -72,7 +74,7 @@ export class BlogsQueryRepository {
     WHERE
         ${whereConditions}
     ORDER BY
-        ${sortField} ${direction}
+        ${sortField} ${collateClause} ${direction}
     LIMIT $${queryParams.length + 1}
     OFFSET $${queryParams.length + 2} * ($${queryParams.length + 3} - 1);
     `,
