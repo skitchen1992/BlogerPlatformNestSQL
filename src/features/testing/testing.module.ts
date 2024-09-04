@@ -9,7 +9,7 @@ import {
 import {
   Comment,
   CommentSchema,
-} from '@features/comments/domain/comment.entity';
+} from '@features/comments/domain/comment-mongo.entity';
 import { Blog, BlogSchema } from '@features/blogs/domain/blog-mongo.entity';
 import { User, UserSchema } from '@features/users/domain/user-mongo.entity';
 

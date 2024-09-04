@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import {
   Comment,
   CommentModelType,
-} from '@features/comments/domain/comment.entity';
+} from '@features/comments/domain/comment-mongo.entity';
 import { Blog, BlogModelType } from '@features/blogs/domain/blog-mongo.entity';
 import { Post, PostModelType } from '@features/posts/domain/post-mongo.entity';
 import { User, UserModelType } from '@features/users/domain/user-mongo.entity';

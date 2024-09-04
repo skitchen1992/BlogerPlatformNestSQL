@@ -5,8 +5,10 @@ import {
   CreateDateColumn,
   ManyToOne,
   JoinColumn,
+  OneToMany,
 } from 'typeorm';
 import { Blog } from '@features/blogs/domain/blog.entity';
+import { Comment } from '@features/comments/domain/comment.entity';
 
 @Entity('posts')
 export class Post {
@@ -42,4 +44,7 @@ export class Post {
   @ManyToOne(() => Blog, (blog) => blog.posts, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'blog_id' }) // Используем нотацию через нижнее подчеркивание
   blog?: Blog;
+
+  @OneToMany(() => Comment, (comment) => comment.post)
+  comments?: Comment[];
 }

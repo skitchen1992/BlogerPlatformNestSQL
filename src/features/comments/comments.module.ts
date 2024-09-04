@@ -11,7 +11,7 @@ import { GetCommentHandler } from '@features/comments/application/handlers/get-c
 import {
   Comment,
   CommentSchema,
-} from '@features/comments/domain/comment.entity';
+} from '@features/comments/domain/comment-mongo.entity';
 import { IsCommentExistHandler } from '@features/comments/application/handlers/is-comment-exist.handler';
 import { CommentsController } from '@features/comments/api/comments.controller';
 import { Like, LikeSchema } from '@features/likes/domain/likes.entity';

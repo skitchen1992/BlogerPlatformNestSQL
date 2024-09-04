@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CommentsRepository } from '@features/comments/infrastructure/comments.repository';
-import { Comment } from '@features/comments/domain/comment.entity';
+import { Comment } from '@features/comments/domain/comment-mongo.entity';
 import { getCurrentISOStringDate } from '@utils/dates';
 
 export class CreateCommentCommand {

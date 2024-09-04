@@ -2,7 +2,7 @@ import { getCurrentISOStringDate } from '@utils/dates';
 import { Blog } from '@features/blogs/domain/blog-mongo.entity';
 import { Post } from '@features/posts/domain/post-mongo.entity';
 import { ObjectId } from 'mongodb';
-import { Comment } from '@features/comments/domain/comment.entity';
+import { Comment } from '@features/comments/domain/comment-mongo.entity';
 import {
   Like,
   LikeStatusEnum,

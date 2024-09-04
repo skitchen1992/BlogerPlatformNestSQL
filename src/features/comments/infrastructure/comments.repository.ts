@@ -4,7 +4,7 @@ import {
   Comment,
   CommentDocument,
   CommentModelType,
-} from '../domain/comment.entity';
+} from '../domain/comment-mongo.entity';
 import { UpdateCommentDto } from '@features/comments/api/dto/input/update-comment.input.dto';
 
 @Injectable()

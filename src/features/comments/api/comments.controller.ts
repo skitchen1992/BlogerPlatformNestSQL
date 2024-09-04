@@ -23,7 +23,7 @@ import { Request } from 'express';
 import { LikeOperationCommand } from '@features/posts/application/handlers/like-operation.handler';
 import { ParentTypeEnum } from '@features/likes/domain/likes.entity';
 import { IsCommentExistCommand } from '@features/comments/application/handlers/is-comment-exist.handler';
-import { CommentDocument } from '@features/comments/domain/comment.entity';
+import { CommentDocument } from '@features/comments/domain/comment-mongo.entity';
 import { BearerTokenInterceptorGuard } from '@infrastructure/guards/bearer-token-interceptor-guard.service';
 import { SkipThrottle } from '@nestjs/throttler';
 

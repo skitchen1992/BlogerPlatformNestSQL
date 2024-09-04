@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Comment, CommentModelType } from '../domain/comment.entity';
+import { Comment, CommentModelType } from '../domain/comment-mongo.entity';
 import { InjectModel } from '@nestjs/mongoose';
 import {
   CommentOutputDto,

@@ -1,4 +1,4 @@
-import { CommentDocument } from '../../../domain/comment.entity';
+import { CommentDocument } from '../../../domain/comment-mongo.entity';
 import { LikeStatusEnum } from '@features/likes/domain/likes.entity';
 
 export interface ILikesInfo {
