@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { Post, PostModelType } from '../domain/post.entity';
 import { InjectModel } from '@nestjs/mongoose';
 import {
   ExtendedLikesInfo,
@@ -7,7 +6,6 @@ import {
   PostOutputDto,
   PostOutputDtoMapper,
 } from '../api/dto/output/post.output.dto';
-import { Pagination } from '@base/models/pagination.base.model';
 import {
   PostOutputPaginationDto,
   PostOutputPaginationDtoMapper,
@@ -21,14 +19,16 @@ import {
 } from '@features/likes/domain/likes.entity';
 import { NEWEST_LIKES_COUNT } from '@utils/consts';
 import { User, UserModelType } from '@features/users/domain/user-mongo.entity';
+import { InjectDataSource } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
+import { PostDetails } from '@features/posts/api/dto/PostDetais';
 
 @Injectable()
 export class PostsQueryRepository {
   constructor(
-    @InjectModel(Post.name) private postModel: PostModelType,
     @InjectModel(User.name) private userModel: UserModelType,
     @InjectModel(Like.name) private likeModel: LikeModelType,
-    private readonly pagination: Pagination,
+    @InjectDataSource() private dataSource: DataSource,
   ) {}
 
   private async getLikeDislikeCounts(
@@ -131,7 +131,16 @@ export class PostsQueryRepository {
     userId?: string,
   ): Promise<PostOutputDto | null> {
     try {
-      const post = await this.postModel.findById(postId).lean();
+      const postList = await this.dataSource.query(
+        `
+    SELECT *
+    FROM posts p
+    WHERE p.id = $1
+    `,
+        [postId],
+      );
+
+      const post = postList.at(0);
 
       if (!post) {
         return null;
@@ -152,39 +161,84 @@ export class PostsQueryRepository {
     params?: { blogId?: string },
     userId?: string,
   ): Promise<PostOutputPaginationDto> {
-    const pagination = this.pagination.getPosts(query, params);
+    const {
+      sortBy = 'createdAt',
+      sortDirection = 'desc',
+      pageNumber = 1,
+      pageSize = 10,
+    } = query;
 
-    const posts = await this.postModel
-      .find(pagination.query)
-      .sort(pagination.sort)
-      .skip(pagination.skip)
-      .limit(pagination.pageSize)
-      .lean();
+    const validSortDirections = ['asc', 'desc'];
+    const direction = validSortDirections.includes(sortDirection)
+      ? sortDirection
+      : 'desc';
 
-    const totalCount = await this.postModel.countDocuments(pagination.query);
+    const sortField = sortBy === 'blogName' ? 'blog_name' : 'created_at';
+
+    let whereConditions = '';
+    const queryParams: any[] = [];
+
+    if (params?.blogId) {
+      whereConditions = `blog_id = $1`;
+      queryParams.push(params.blogId);
+    } else {
+      whereConditions = 'TRUE';
+    }
+
+    const collateClause = sortField === 'blog_name' ? 'COLLATE "C"' : '';
+
+    const posts: PostDetails[] = await this.dataSource.query(
+      `
+    SELECT *
+    FROM
+        posts 
+    WHERE
+        ${whereConditions}
+    ORDER BY
+        ${sortField} ${collateClause} ${direction}
+    LIMIT $${queryParams.length + 1}
+    OFFSET $${queryParams.length + 2} * ($${queryParams.length + 3} - 1);
+    `,
+      [
+        ...queryParams,
+        pageSize, // LIMIT
+        pageSize, // OFFSET calculation
+        pageNumber, // used for OFFSET
+      ],
+    );
 
     const postList = await Promise.all(
       posts.map(async (post) => {
         if (userId) {
           const extendedLikesInfo = await this.getLikesInfoForAuthUser(
-            post._id.toString(),
+            post.id,
             userId,
           );
           return PostOutputDtoMapper(post, extendedLikesInfo);
         } else {
           const extendedLikesInfo = await this.getLikesInfoForNotAuthUser(
-            post._id.toString(),
+            post.id,
           );
           return PostOutputDtoMapper(post, extendedLikesInfo);
         }
       }),
     );
 
+    const totalCount = await this.dataSource.query(
+      `
+    SELECT COUNT(*)::int AS count
+    FROM posts
+    WHERE
+        ${whereConditions}
+    `,
+      queryParams,
+    );
+
     return PostOutputPaginationDtoMapper(
       postList,
-      totalCount,
-      pagination.pageSize,
-      pagination.page,
+      totalCount.at(0).count,
+      Number(pageSize),
+      Number(pageNumber),
     );
   }
 }

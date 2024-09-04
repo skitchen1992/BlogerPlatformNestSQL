@@ -4,8 +4,8 @@ import {
   Comment,
   CommentModelType,
 } from '@features/comments/domain/comment.entity';
-import { Blog, BlogModelType } from '@features/blogs/domain/blog.entity';
-import { Post, PostModelType } from '@features/posts/domain/post.entity';
+import { Blog, BlogModelType } from '@features/blogs/domain/blog-mongo.entity';
+import { Post, PostModelType } from '@features/posts/domain/post-mongo.entity';
 import { User, UserModelType } from '@features/users/domain/user-mongo.entity';
 import { SkipThrottle } from '@nestjs/throttler';
 import { InjectDataSource } from '@nestjs/typeorm';
@@ -30,7 +30,7 @@ export class TestingController {
     await this.userModel.deleteMany({});
     await this.commentsModel.deleteMany({});
 
-    const tables = ['users']; // Список всех таблиц, которые нужно очистить
+    const tables = ['users', 'blogs', 'posts']; // Список всех таблиц, которые нужно очистить
 
     for (const table of tables) {
       await this.dataSource.query(

@@ -24,7 +24,7 @@ export class User {
   @Column({ type: 'varchar' })
   email: string;
 
-  @Column({ type: 'timestamptz', default: () => 'NOW' })
+  @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
   created_at: string;
 
   @OneToOne(() => EmailConfirmation, { nullable: true, cascade: true })

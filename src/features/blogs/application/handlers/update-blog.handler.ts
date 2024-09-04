@@ -26,7 +26,10 @@ export class UpdateBlogHandler
       websiteUrl,
     };
 
-    const isUpdated: boolean = await this.blogsRepository.update(id, data);
+    const isUpdated: boolean = await this.blogsRepository.updateBlogById(
+      id,
+      data,
+    );
 
     if (!isUpdated) {
       throw new NotFoundException(`Blog with id ${id} not found`);

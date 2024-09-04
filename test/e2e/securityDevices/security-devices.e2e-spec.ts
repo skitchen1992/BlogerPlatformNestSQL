@@ -6,7 +6,7 @@ import { HttpStatus } from '@nestjs/common';
 import { ID } from '../../mocks/mocks';
 
 describe(`Endpoint (GET) - /devices`, () => {
-  it('Should get 2 devices', async () => {
+  it('Should getUserById 2 devices', async () => {
     const password = 'password';
 
     const user = testSeeder.createUserDtoHashPass(
@@ -56,7 +56,7 @@ describe(`Endpoint (GET) - /devices`, () => {
 });
 
 describe(`Endpoint (DELETE) - /devices`, () => {
-  it('Should get 0 devices', async () => {
+  it('Should getUserById 0 devices', async () => {
     const password = 'password';
 
     const user = testSeeder.createUserDtoHashPass(

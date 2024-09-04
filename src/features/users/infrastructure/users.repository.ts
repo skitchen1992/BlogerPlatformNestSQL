@@ -10,7 +10,7 @@ import { UserDetails } from '@features/users/api/dto/UserDetais';
 export class UsersRepository {
   constructor(@InjectDataSource() private dataSource: DataSource) {}
 
-  public async get(userId: string): Promise<UserDetails | null> {
+  public async getUserById(userId: string): Promise<UserDetails | null> {
     try {
       const user = await this.dataSource.query(
         `
@@ -102,7 +102,7 @@ export class UsersRepository {
 
       return Boolean(result.at(1));
     } catch (e) {
-      console.error('Error during delete operation:', e);
+      console.error('Error during deleteBlogById operation:', e);
       return false;
     }
   }

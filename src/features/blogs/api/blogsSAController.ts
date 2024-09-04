@@ -24,7 +24,6 @@ import {
 import { CreatePostForBlogDto } from '@features/blogs/api/dto/input/create-post-for-blog.input.dto';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { CreateBlogCommand } from '@features/blogs/application/handlers/create-blog.handler';
-import { CreatePostForBlogCommand } from '@features/blogs/application/handlers/create-post-for-blog.handler';
 import { UpdateBlogCommand } from '@features/blogs/application/handlers/update-blog.handler';
 import { DeleteBlogCommand } from '@features/blogs/application/handlers/delete-blog.handler';
 import { GetAllQuery } from '@features/blogs/application/handlers/get-all.handler';
@@ -33,20 +32,25 @@ import { GetPostForBlogQuery } from '@features/blogs/application/handlers/get-po
 import { GetBlogQuery } from '@features/blogs/application/handlers/get-blog.handler';
 import { BasicAuthGuard } from '@infrastructure/guards/basic-auth-guard.service';
 import { GetPostQuery } from '@features/posts/application/handlers/get-post.handler';
-import { BearerTokenInterceptorGuard } from '@infrastructure/guards/bearer-token-interceptor-guard.service';
 import { Request } from 'express';
 import { SkipThrottle } from '@nestjs/throttler';
+import { CreatePostCommand } from '@features/posts/application/handlers/create-post.handler';
+import { UpdatePostCommand } from '@features/posts/application/handlers/update-post.handler';
+import { UpdatePostForBlogDto } from '@features/blogs/api/dto/input/update-post-for-blog.input.dto';
+import { DeletePostCommand } from '@features/posts/application/handlers/delete-post.handler';
 
 // Tag для swagger
 @SkipThrottle()
 @ApiTags('Blogs')
-@Controller('blogs')
-export class BlogsController {
+@Controller('sa/blogs')
+export class BlogsSAController {
   constructor(
     private readonly commandBus: CommandBus,
     private readonly queryBus: QueryBus,
   ) {}
 
+  @ApiSecurity('basic')
+  @UseGuards(BasicAuthGuard)
   @Get()
   async getAll(@Query() query: UsersQuery) {
     return await this.queryBus.execute<GetAllQuery, BlogOutputPaginationDto>(
@@ -70,7 +74,10 @@ export class BlogsController {
     );
   }
 
-  @UseGuards(BearerTokenInterceptorGuard)
+  // @ApiSecurity('bearer')
+  // @UseGuards(BearerTokenInterceptorGuard)
+  @ApiSecurity('basic')
+  @UseGuards(BasicAuthGuard)
   @Get(':blogId/posts')
   async getPostsForBlog(
     @Param('blogId') blogId: string,
@@ -95,17 +102,46 @@ export class BlogsController {
     const { title, shortDescription, content } = input;
 
     const createdPostId: string = await this.commandBus.execute<
-      CreatePostForBlogCommand,
+      CreatePostCommand,
       string
-    >(new CreatePostForBlogCommand(title, shortDescription, content, blogId));
+    >(new CreatePostCommand(title, shortDescription, content, blogId));
 
     return await this.queryBus.execute<GetPostQuery, PostsQueryRepository>(
       new GetPostQuery(createdPostId),
     );
   }
 
+  @ApiSecurity('basic')
+  @UseGuards(BasicAuthGuard)
+  @Put(':blogId/posts/:postId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async updatePostForBlog(
+    @Param('blogId') blogId: string,
+    @Param('postId') postId: string,
+    @Body() input: UpdatePostForBlogDto,
+  ) {
+    const { title, shortDescription, content } = input;
+
+    await this.commandBus.execute<UpdatePostCommand, void>(
+      new UpdatePostCommand(postId, title, shortDescription, content, blogId),
+    );
+  }
+
+  @ApiSecurity('basic')
+  @UseGuards(BasicAuthGuard)
+  @Delete(':blogId/posts/:postId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deletePostForBlog(
+    @Param('blogId') blogId: string,
+    @Param('postId') postId: string,
+  ) {
+    await this.commandBus.execute<DeletePostCommand, void>(
+      new DeletePostCommand(postId, blogId),
+    );
+  }
+
   @Get(':id')
-  async getById(@Param('id') id: string) {
+  async getBlogById(@Param('id') id: string) {
     return await this.queryBus.execute<GetBlogQuery, PostOutputPaginationDto>(
       new GetBlogQuery(id),
     );
@@ -115,7 +151,7 @@ export class BlogsController {
   @UseGuards(BasicAuthGuard)
   @Put(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async update(@Param('id') id: string, @Body() input: UpdateBlogDto) {
+  async updateBlog(@Param('id') id: string, @Body() input: UpdateBlogDto) {
     const { name, description, websiteUrl } = input;
 
     await this.commandBus.execute<UpdateBlogCommand, void>(
@@ -127,7 +163,7 @@ export class BlogsController {
   @UseGuards(BasicAuthGuard)
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async delete(@Param('id') id: string) {
+  async deleteBlog(@Param('id') id: string) {
     await this.commandBus.execute<DeleteBlogCommand, void>(
       new DeleteBlogCommand(id),
     );

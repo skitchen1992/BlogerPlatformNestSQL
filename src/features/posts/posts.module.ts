@@ -12,7 +12,7 @@ import { IsBlogExistCommand } from '@features/posts/application/handlers/is-blog
 import { GetCommentForPostHandler } from '@features/posts/application/handlers/get-comment.handler';
 import { GetCommentsForPostHandler } from '@features/posts/application/handlers/get-comments-for-post.handler';
 import { GetAllPostsHandler } from '@features/posts/application/handlers/get-all-posts.handler';
-import { Post, PostSchema } from '@features/posts/domain/post.entity';
+import { Post, PostSchema } from '@features/posts/domain/post-mongo.entity';
 import { BlogsModule } from '@features/blogs/blogs.module';
 import { CommentsModule } from '@features/comments/comments.module';
 import { PostsController } from '@features/posts/api/posts.controller';

@@ -47,7 +47,7 @@ export class NewPassportHandler
       });
     }
 
-    const user = await this.usersRepository.get(userId);
+    const user = await this.usersRepository.getUserById(userId);
 
     if (
       user?.recovery_is_confirmed ||

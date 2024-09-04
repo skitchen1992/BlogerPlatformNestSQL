@@ -1,7 +1,6 @@
-import { add, getCurrentISOStringDate } from '@utils/dates';
-import { getUniqueId } from '@utils/utils';
-import { Blog } from '@features/blogs/domain/blog.entity';
-import { Post } from '@features/posts/domain/post.entity';
+import { getCurrentISOStringDate } from '@utils/dates';
+import { Blog } from '@features/blogs/domain/blog-mongo.entity';
+import { Post } from '@features/posts/domain/post-mongo.entity';
 import { ObjectId } from 'mongodb';
 import { Comment } from '@features/comments/domain/comment.entity';
 import {

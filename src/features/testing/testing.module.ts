@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Post, PostSchema } from '@features/posts/domain/post.entity';
+import { Post, PostSchema } from '@features/posts/domain/post-mongo.entity';
 import { TestingController } from '@features/testing/api/testing.controller';
 import {
   Session,
@@ -10,7 +10,7 @@ import {
   Comment,
   CommentSchema,
 } from '@features/comments/domain/comment.entity';
-import { Blog, BlogSchema } from '@features/blogs/domain/blog.entity';
+import { Blog, BlogSchema } from '@features/blogs/domain/blog-mongo.entity';
 import { User, UserSchema } from '@features/users/domain/user-mongo.entity';
 
 @Module({

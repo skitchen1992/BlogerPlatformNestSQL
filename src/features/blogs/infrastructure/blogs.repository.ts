@@ -1,57 +1,121 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Blog, BlogDocument, BlogModelType } from '../domain/blog.entity';
-import { UpdateQuery } from 'mongoose';
+import { BlogModelType } from '../domain/blog-mongo.entity';
+import { Blog } from '@features/blogs/domain/blog.entity';
+import { InjectDataSource } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
+import { UpdateBlogDto } from '@features/blogs/api/dto/input/update-blog.input.dto';
+import { BlogDetails } from '@features/blogs/api/dto/BlogDetais';
 
 @Injectable()
 export class BlogsRepository {
-  constructor(@InjectModel(Blog.name) private blogModel: BlogModelType) {}
+  constructor(
+    @InjectModel(Blog.name) private blogModel: BlogModelType,
+    @InjectDataSource() private dataSource: DataSource,
+  ) {}
 
-  public async get(id: string): Promise<BlogDocument | null> {
+  public async getBlogById(blogId: string): Promise<BlogDetails | null> {
     try {
-      const blog = await this.blogModel.findById(id).lean();
+      const blog = await this.dataSource.query(
+        `
+    SELECT *
+    FROM
+        blogs b
+     WHERE b.id = $1
+    `,
+        [blogId],
+      );
 
-      if (!blog) {
+      if (!blog.at(0)) {
         return null;
       }
 
-      return blog;
+      return blog.at(0);
     } catch (e) {
       return null;
     }
   }
 
   public async create(newBlog: Blog): Promise<string> {
-    const insertResult = await this.blogModel.insertMany([newBlog]);
+    try {
+      const result = await this.dataSource.query(
+        `
+      INSERT INTO blogs (name, description, website_url, is_membership)
+      VALUES ($1, $2, $3, $4)
+      RETURNING id;
+    `,
+        [
+          newBlog.name,
+          newBlog.description,
+          newBlog.website_url,
+          newBlog.is_membership,
+        ],
+      );
 
-    return insertResult[0].id;
+      return result[0].id;
+    } catch (e) {
+      console.error('Error inserting blog into database', {
+        error: e,
+      });
+      return '';
+    }
   }
 
-  public async update(id: string, data: UpdateQuery<Blog>): Promise<boolean> {
+  public async updateBlogById(
+    blogId: string,
+    data: UpdateBlogDto,
+  ): Promise<boolean> {
     try {
-      const updatedResult = await this.blogModel.updateOne({ _id: id }, data);
+      const updateResult = await this.dataSource.query(
+        `
+      UPDATE blogs
+      SET name = $1, 
+          description = $2,
+          website_url = $3
+      WHERE id = $4
+      RETURNING id;
+      `,
+        [data.name, data.description, data.websiteUrl, blogId],
+      );
 
-      return updatedResult.modifiedCount === 1;
+      return Boolean(updateResult.at(1));
     } catch (e) {
+      console.error('Error updating blog into database', {
+        error: e,
+      });
       return false;
     }
   }
 
-  public async delete(id: string): Promise<boolean> {
+  public async deleteBlogById(blogId: string): Promise<boolean> {
     try {
-      const deleteResult = await this.blogModel.deleteOne({ _id: id });
+      const result = await this.dataSource.query(
+        `
+      DELETE FROM blogs 
+      WHERE id = $1
+      RETURNING *;
+      `,
+        [blogId],
+      );
 
-      return deleteResult.deletedCount === 1;
+      return Boolean(result.at(1));
     } catch (e) {
+      console.error('Error during deleteBlogById operation:', e);
       return false;
     }
   }
 
-  public async isBlogExist(userId: string): Promise<boolean> {
+  public async isBlogExist(blogId: string): Promise<boolean> {
     try {
-      const blog = await this.blogModel.countDocuments({ _id: userId }).lean();
+      const isBlogExist = await this.dataSource.query(
+        ` 
+    select 1 from blogs 
+    where id = $1
+    `,
+        [blogId],
+      );
 
-      return Boolean(blog);
+      return Boolean(isBlogExist.at(0));
     } catch (e) {
       return false;
     }

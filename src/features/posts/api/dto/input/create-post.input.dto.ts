@@ -1,5 +1,5 @@
 import { Trim } from '@infrastructure/decorators/transform/trim';
-import { IsMongoId, IsNotEmpty, IsString, Length } from 'class-validator';
+import { IsNotEmpty, IsString, IsUUID, Length } from 'class-validator';
 import { IsBlogExist } from '@infrastructure/decorators/validate/is-blog-exist.decorator';
 
 export class CreatePostDto {
@@ -25,7 +25,7 @@ export class CreatePostDto {
   @IsNotEmpty({ message: 'Content is required' })
   content: string;
 
-  @IsMongoId()
+  @IsUUID()
   @IsString({ message: 'BlogId must be a string' })
   @Trim()
   @IsNotEmpty({ message: 'BlogId is required' })

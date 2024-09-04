@@ -27,15 +27,15 @@
 // import { SkipThrottle } from '@nestjs/throttler';
 //
 // describe(`Endpoint (GET) - /posts`, () => {
-//   it('Should get empty array', async () => {
+//   it('Should getUserById empty array', async () => {
 //     const res = await request(app.getHttpServer())
-//       .get(`${APP_PREFIX}/posts`)
+//       .getUserById(`${APP_PREFIX}/posts`)
 //       .expect(HttpStatus.OK);
 //
 //     expect(res.body.items.length).toBe(0);
 //   });
 //
-//   it('Should get not empty array', async () => {
+//   it('Should getUserById not empty array', async () => {
 //     const result = await mockBlogModel.insertMany(
 //       testSeeder.createBlogListDto(1),
 //     );
@@ -71,7 +71,7 @@
 //     };
 //
 //     const res = await request(app.getHttpServer())
-//       .get(`${APP_PREFIX}/posts`)
+//       .getUserById(`${APP_PREFIX}/posts`)
 //       .expect(HttpStatus.OK);
 //
 //     expect(res.body.items.length).toBe(1);
@@ -87,7 +87,7 @@
 //     });
 //   });
 //
-//   it('Should get second page', async () => {
+//   it('Should getUserById second page', async () => {
 //     const result = await mockBlogModel.insertMany(
 //       testSeeder.createBlogListDto(1),
 //     );
@@ -118,7 +118,7 @@
 //     };
 //
 //     const res = await request(app.getHttpServer())
-//       .get(`${APP_PREFIX}/posts?pageNumber=2&pageSize=2`)
+//       .getUserById(`${APP_PREFIX}/posts?pageNumber=2&pageSize=2`)
 //       .expect(HttpStatus.OK);
 //
 //     expect(res.body).toEqual({
@@ -132,7 +132,7 @@
 // });
 //
 // describe(`Endpoint (GET) by ID - /posts/:id`, () => {
-//   it('Should get a post', async () => {
+//   it('Should getUserById a post', async () => {
 //     const blogList = await mockBlogModel.insertMany(
 //       testSeeder.createBlogListDto(1),
 //     );
@@ -166,7 +166,7 @@
 //       ],
 //     };
 //     const res = await request(app.getHttpServer())
-//       .get(`${APP_PREFIX}/posts/${postId}`)
+//       .getUserById(`${APP_PREFIX}/posts/${postId}`)
 //       .expect(HttpStatus.OK);
 //
 //     expect(res.body).toEqual(
@@ -174,7 +174,7 @@
 //     );
 //   });
 //
-//   it(`Should get status ${HttpStatus.NOT_FOUND}`, async () => {
+//   it(`Should getUserById status ${HttpStatus.NOT_FOUND}`, async () => {
 //     const blogList = await mockBlogModel.insertMany(
 //       testSeeder.createBlogListDto(1),
 //     );
@@ -183,7 +183,7 @@
 //     await mockPostModel.insertMany(testSeeder.createPostListDto(1, blogId));
 //
 //     await request(app.getHttpServer())
-//       .get(`${APP_PREFIX}/posts/${ID}`)
+//       .getUserById(`${APP_PREFIX}/posts/${ID}`)
 //       .expect(HttpStatus.NOT_FOUND);
 //   });
 // });
@@ -212,7 +212,7 @@
 //     );
 //   });
 //
-//   it('Should get error while blog not found', async () => {
+//   it('Should getUserById error while blog not found', async () => {
 //     const res = await request(app.getHttpServer())
 //       .post(`${APP_PREFIX}/posts`)
 //       .set(
@@ -227,7 +227,7 @@
 //     expect(res.body).toEqual(data.errorDataSet0);
 //   });
 //
-//   it('Should get Error while field "title" is too long', async () => {
+//   it('Should getUserById Error while field "title" is too long', async () => {
 //     const blogList = await mockBlogModel.insertMany(
 //       testSeeder.createBlogListDto(1),
 //     );
@@ -247,7 +247,7 @@
 //     expect(res.body).toEqual(data.errorDataSet1);
 //   });
 //
-//   it('Should get Error while field "title" is not a string', async () => {
+//   it('Should getUserById Error while field "title" is not a string', async () => {
 //     const blogList = await mockBlogModel.insertMany(
 //       testSeeder.createBlogListDto(1),
 //     );
@@ -267,7 +267,7 @@
 //     expect(res.body).toEqual(data.errorDataSet2);
 //   });
 //
-//   it('Should get Error while field "title" is empty', async () => {
+//   it('Should getUserById Error while field "title" is empty', async () => {
 //     const blogList = await mockBlogModel.insertMany(
 //       testSeeder.createBlogListDto(1),
 //     );
@@ -287,7 +287,7 @@
 //     expect(res.body).toEqual(data.errorDataSet11);
 //   });
 //
-//   it('Should get Error while field "shortDescription" is too long', async () => {
+//   it('Should getUserById Error while field "shortDescription" is too long', async () => {
 //     const blogList = await mockBlogModel.insertMany(
 //       testSeeder.createBlogListDto(1),
 //     );
@@ -307,7 +307,7 @@
 //     expect(res.body).toEqual(data.errorDataSet12);
 //   });
 //
-//   it('Should get Error while field "shortDescription" is not a string', async () => {
+//   it('Should getUserById Error while field "shortDescription" is not a string', async () => {
 //     const blogList = await mockBlogModel.insertMany(
 //       testSeeder.createBlogListDto(1),
 //     );
@@ -327,7 +327,7 @@
 //     expect(res.body).toEqual(data.errorDataSet13);
 //   });
 //
-//   it('Should get Error while field "description" is empty', async () => {
+//   it('Should getUserById Error while field "description" is empty', async () => {
 //     const blogList = await mockBlogModel.insertMany(
 //       testSeeder.createBlogListDto(1),
 //     );
@@ -347,7 +347,7 @@
 //     expect(res.body).toEqual(data.errorDataSet6);
 //   });
 //
-//   it('Should get Error while field "content" is too long', async () => {
+//   it('Should getUserById Error while field "content" is too long', async () => {
 //     const blogList = await mockBlogModel.insertMany(
 //       testSeeder.createBlogListDto(1),
 //     );
@@ -367,7 +367,7 @@
 //     expect(res.body).toEqual(data.errorDataSet7);
 //   });
 //
-//   it('Should get Error while field "content" is not a string', async () => {
+//   it('Should getUserById Error while field "content" is not a string', async () => {
 //     const blogList = await mockBlogModel.insertMany(
 //       testSeeder.createBlogListDto(1),
 //     );
@@ -387,7 +387,7 @@
 //     expect(res.body).toEqual(data.errorDataSet8);
 //   });
 //
-//   it('Should get Error while field "content" is empty', async () => {
+//   it('Should getUserById Error while field "content" is empty', async () => {
 //     const blogList = await mockBlogModel.insertMany(
 //       testSeeder.createBlogListDto(1),
 //     );
@@ -439,7 +439,7 @@
 //     );
 //   });
 //
-//   it('Should get Error while field "title" is too long', async () => {
+//   it('Should getUserById Error while field "title" is too long', async () => {
 //     const blogList = await mockBlogModel.insertMany(
 //       testSeeder.createBlogListDto(1),
 //     );
@@ -464,7 +464,7 @@
 //     expect(res.body).toEqual(data.errorDataSet1);
 //   });
 //
-//   it('Should get Error while field "title" is not a string', async () => {
+//   it('Should getUserById Error while field "title" is not a string', async () => {
 //     const blogList = await mockBlogModel.insertMany(
 //       testSeeder.createBlogListDto(1),
 //     );
@@ -489,7 +489,7 @@
 //     expect(res.body).toEqual(data.errorDataSet15);
 //   });
 //
-//   it('Should get Error while field "title" is empty', async () => {
+//   it('Should getUserById Error while field "title" is empty', async () => {
 //     const blogList = await mockBlogModel.insertMany(
 //       testSeeder.createBlogListDto(1),
 //     );
@@ -514,7 +514,7 @@
 //     expect(res.body).toEqual(data.errorDataSet3);
 //   });
 //
-//   it('Should get Error while field "shortDescription" is too long', async () => {
+//   it('Should getUserById Error while field "shortDescription" is too long', async () => {
 //     const blogList = await mockBlogModel.insertMany(
 //       testSeeder.createBlogListDto(1),
 //     );
@@ -539,7 +539,7 @@
 //     expect(res.body).toEqual(data.errorDataSet16);
 //   });
 //
-//   it('Should get Error while field "shortDescription" is not a string', async () => {
+//   it('Should getUserById Error while field "shortDescription" is not a string', async () => {
 //     const blogList = await mockBlogModel.insertMany(
 //       testSeeder.createBlogListDto(1),
 //     );
@@ -563,7 +563,7 @@
 //     expect(res.body).toEqual(data.errorDataSet5);
 //   });
 //
-//   it('Should get Error while field "description" is empty', async () => {
+//   it('Should getUserById Error while field "description" is empty', async () => {
 //     const blogList = await mockBlogModel.insertMany(
 //       testSeeder.createBlogListDto(1),
 //     );
@@ -588,7 +588,7 @@
 //     expect(res.body).toEqual(data.errorDataSet17);
 //   });
 //
-//   it('Should get Error while field "content" is too long', async () => {
+//   it('Should getUserById Error while field "content" is too long', async () => {
 //     const blogList = await mockBlogModel.insertMany(
 //       testSeeder.createBlogListDto(1),
 //     );
@@ -613,7 +613,7 @@
 //     expect(res.body).toEqual(data.errorDataSet7);
 //   });
 //
-//   it('Should get Error while field "content" is not a string', async () => {
+//   it('Should getUserById Error while field "content" is not a string', async () => {
 //     const blogList = await mockBlogModel.insertMany(
 //       testSeeder.createBlogListDto(1),
 //     );
@@ -638,7 +638,7 @@
 //     expect(res.body).toEqual(data.errorDataSet18);
 //   });
 //
-//   it('Should get Error while field "content" is empty', async () => {
+//   it('Should getUserById Error while field "content" is empty', async () => {
 //     const blogList = await mockBlogModel.insertMany(
 //       testSeeder.createBlogListDto(1),
 //     );
@@ -663,7 +663,7 @@
 //     expect(res.body).toEqual(data.errorDataSet9);
 //   });
 //
-//   it('Should get Error while we add too many fields specified', async () => {
+//   it('Should getUserById Error while we add too many fields specified', async () => {
 //     const blogList = await mockBlogModel.insertMany(
 //       testSeeder.createBlogListDto(1),
 //     );
@@ -688,7 +688,7 @@
 // });
 //
 // describe(`Endpoint (DELETE) - /posts/:id`, () => {
-//   it('Should delete post', async () => {
+//   it('Should deleteBlogById post', async () => {
 //     const blogList = await mockBlogModel.insertMany(
 //       testSeeder.createBlogListDto(1),
 //     );
@@ -700,7 +700,7 @@
 //     const postId = postList[0]._id.toString();
 //
 //     await request(app.getHttpServer())
-//       .delete(`${APP_PREFIX}/posts/${postId}`)
+//       .deleteBlogById(`${APP_PREFIX}/posts/${postId}`)
 //       .set(
 //         createAuthorizationHeader(
 //           apiSettings.ADMIN_AUTH_USERNAME,
@@ -714,7 +714,7 @@
 //     expect(post).toBe(null);
 //   });
 //
-//   it(`Should get error ${HttpStatus.NOT_FOUND}`, async () => {
+//   it(`Should getUserById error ${HttpStatus.NOT_FOUND}`, async () => {
 //     const blogList = await mockBlogModel.insertMany(
 //       testSeeder.createBlogListDto(1),
 //     );
@@ -726,7 +726,7 @@
 //     const postId = postList[0]._id.toString();
 //
 //     await request(app.getHttpServer())
-//       .delete(`${APP_PREFIX}/posts/${ID}`)
+//       .deleteBlogById(`${APP_PREFIX}/posts/${ID}`)
 //       .set(
 //         createAuthorizationHeader(
 //           apiSettings.ADMIN_AUTH_USERNAME,
@@ -741,7 +741,7 @@
 // });
 //
 // describe(`Endpoint (POST) - /:postId/comments`, () => {
-//   it('Should get created comment', async () => {
+//   it('Should getUserById created comment', async () => {
 //     const login = 'testLogin';
 //     const password = 'string';
 //
@@ -794,7 +794,7 @@
 //     );
 //   });
 //
-//   it(`Should get ${HttpStatus.BAD_REQUEST}`, async () => {
+//   it(`Should getUserById ${HttpStatus.BAD_REQUEST}`, async () => {
 //     const login = 'testLogin';
 //     const password = 'string';
 //
@@ -839,7 +839,7 @@
 //       .expect(HttpStatus.BAD_REQUEST);
 //   });
 //
-//   it(`Should get ${HttpStatus.UNAUTHORIZED}`, async () => {
+//   it(`Should getUserById ${HttpStatus.UNAUTHORIZED}`, async () => {
 //     const login = 'testLogin';
 //     const password = 'string';
 //
@@ -881,7 +881,7 @@
 //       .expect(HttpStatus.UNAUTHORIZED);
 //   });
 //
-//   it(`Should get ${HttpStatus.NOT_FOUND}`, async () => {
+//   it(`Should getUserById ${HttpStatus.NOT_FOUND}`, async () => {
 //     const login = 'testLogin';
 //     const password = 'string';
 //
@@ -918,7 +918,7 @@
 // });
 //
 // describe(`Endpoint (GET) - /:postId/comments`, () => {
-//   it('Should get empty array comment', async () => {
+//   it('Should getUserById empty array comment', async () => {
 //     const login = 'testLogin';
 //     const password = 'string';
 //
@@ -955,7 +955,7 @@
 //     const postId = postList[0]._id.toString();
 //
 //     const res = await request(app.getHttpServer())
-//       .get(`${APP_PREFIX}/posts/${postId}/comments`)
+//       .getUserById(`${APP_PREFIX}/posts/${postId}/comments`)
 //       .set(createBearerAuthorizationHeader(token.body.accessToken))
 //       .expect(HttpStatus.OK);
 //
@@ -968,7 +968,7 @@
 //     });
 //   });
 //
-//   it('Should get not empty array comment', async () => {
+//   it('Should getUserById not empty array comment', async () => {
 //     const { login, password, email } = testSeeder.createUserDto();
 //
 //     await request(app.getHttpServer())
@@ -1013,7 +1013,7 @@
 //       .expect(HttpStatus.CREATED);
 //
 //     const res = await request(app.getHttpServer())
-//       .get(`${APP_PREFIX}/posts/${postId}/comments`)
+//       .getUserById(`${APP_PREFIX}/posts/${postId}/comments`)
 //       .set(createBearerAuthorizationHeader(token.body.accessToken))
 //       .send({
 //         content: 'content content content',
@@ -1039,7 +1039,7 @@
 //     });
 //   });
 //
-//   it('Should get comments with likes', async () => {
+//   it('Should getUserById comments with likes', async () => {
 //     const login = 'testLogin';
 //     const password = 'string';
 //
@@ -1084,7 +1084,7 @@
 //       .expect(HttpStatus.CREATED);
 //
 //     const res = await request(app.getHttpServer())
-//       .get(`${APP_PREFIX}/posts/${postId}/comments`)
+//       .getUserById(`${APP_PREFIX}/posts/${postId}/comments`)
 //       .set(createBearerAuthorizationHeader(token.body.accessToken))
 //       .send({
 //         content: 'content content content',
@@ -1110,7 +1110,7 @@
 //     });
 //   });
 //
-//   it(`Should get ${HttpStatus.NOT_FOUND}`, async () => {
+//   it(`Should getUserById ${HttpStatus.NOT_FOUND}`, async () => {
 //     const login = 'testLogin';
 //     const password = 'string';
 //
@@ -1155,7 +1155,7 @@
 //       .expect(HttpStatus.CREATED);
 //
 //     await request(app.getHttpServer())
-//       .get(`${APP_PREFIX}/posts/${ID}/comments`)
+//       .getUserById(`${APP_PREFIX}/posts/${ID}/comments`)
 //       .expect(HttpStatus.NOT_FOUND);
 //   });
 // });
@@ -1206,7 +1206,7 @@
 //       .expect(HttpStatus.NO_CONTENT);
 //
 //     const res = await request(app.getHttpServer())
-//       .get(`${APP_PREFIX}/posts/${postId}`)
+//       .getUserById(`${APP_PREFIX}/posts/${postId}`)
 //       .set(createBearerAuthorizationHeader(token.body.accessToken))
 //       .expect(HttpStatus.OK);
 //
@@ -1279,7 +1279,7 @@
 //       .expect(HttpStatus.NO_CONTENT);
 //
 //     const res = await request(app.getHttpServer())
-//       .get(`${APP_PREFIX}/posts/${postId}`)
+//       .getUserById(`${APP_PREFIX}/posts/${postId}`)
 //       .set(createBearerAuthorizationHeader(token.body.accessToken))
 //       .expect(HttpStatus.OK);
 //
@@ -1348,7 +1348,7 @@
 //       .expect(HttpStatus.NO_CONTENT);
 //
 //     const res = await request(app.getHttpServer())
-//       .get(`${APP_PREFIX}/posts/${postId}`)
+//       .getUserById(`${APP_PREFIX}/posts/${postId}`)
 //       .set(createBearerAuthorizationHeader(token.body.accessToken))
 //       .expect(HttpStatus.OK);
 //
@@ -1422,7 +1422,7 @@
 //       .expect(HttpStatus.NO_CONTENT);
 //
 //     const res = await request(app.getHttpServer())
-//       .get(`${APP_PREFIX}/comments/${commentId}`)
+//       .getUserById(`${APP_PREFIX}/comments/${commentId}`)
 //       .set(createBearerAuthorizationHeader(token.body.accessToken))
 //       .expect(HttpStatus.OK);
 //
@@ -1437,7 +1437,7 @@
 //     );
 //   });
 //
-//   it(`Should get ${HttpStatus.BAD_REQUEST}`, async () => {
+//   it(`Should getUserById ${HttpStatus.BAD_REQUEST}`, async () => {
 //     const login = 'testLogin';
 //     const password = 'string';
 //
@@ -1487,7 +1487,7 @@
 //       .expect(HttpStatus.BAD_REQUEST);
 //   });
 //
-//   it(`Should get ${HttpStatus.UNAUTHORIZED}`, async () => {
+//   it(`Should getUserById ${HttpStatus.UNAUTHORIZED}`, async () => {
 //     const login = 'testLogin';
 //     const password = 'string';
 //
@@ -1530,7 +1530,7 @@
 //       .expect(HttpStatus.UNAUTHORIZED);
 //   });
 //
-//   it(`Should get ${HttpStatus.NOT_FOUND}`, async () => {
+//   it(`Should getUserById ${HttpStatus.NOT_FOUND}`, async () => {
 //     const login = 'testLogin';
 //     const password = 'string';
 //

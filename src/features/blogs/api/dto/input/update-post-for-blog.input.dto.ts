@@ -1,8 +1,7 @@
 import { Trim } from '@infrastructure/decorators/transform/trim';
-import { IsNotEmpty, IsString, IsUUID, Length } from 'class-validator';
-import { IsBlogExist } from '@infrastructure/decorators/validate/is-blog-exist.decorator';
+import { IsNotEmpty, IsString, Length } from 'class-validator';
 
-export class UpdatePostDto {
+export class UpdatePostForBlogDto {
   @IsNotEmpty({ message: 'Title is required' })
   @IsString({ message: 'Title must be a string' })
   @Trim()
@@ -24,11 +23,4 @@ export class UpdatePostDto {
     message: 'Content must be between 1 and 1000 characters',
   })
   content: string;
-
-  @IsNotEmpty({ message: 'BlogId is required' })
-  @IsUUID()
-  @IsString({ message: 'BlogId must be a string' })
-  @Trim()
-  @IsBlogExist()
-  blogId: string;
 }

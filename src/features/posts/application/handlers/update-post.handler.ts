@@ -1,11 +1,11 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { PostsRepository } from '@features/posts/infrastructure/posts.repository';
-import { UpdatePostDto } from '@features/posts/api/dto/input/update-post.input.dto';
 import { NotFoundException } from '@nestjs/common';
+import { IUpdatePostDto } from '@features/posts/api/dto/update-post.dto';
 
 export class UpdatePostCommand {
   constructor(
-    public id: string,
+    public postId: string,
     public title: string,
     public shortDescription: string,
     public content: string,
@@ -19,19 +19,22 @@ export class UpdatePostHandler
 {
   constructor(private readonly postsRepository: PostsRepository) {}
   async execute(command: UpdatePostCommand): Promise<void> {
-    const { id, title, shortDescription, content, blogId } = command;
+    const { postId, title, shortDescription, content, blogId } = command;
 
-    const data: UpdatePostDto = {
+    const data: IUpdatePostDto = {
       title,
       shortDescription,
       content,
-      blogId,
     };
 
-    const isUpdated: boolean = await this.postsRepository.update(id, data);
+    const isUpdated: boolean = await this.postsRepository.update(
+      postId,
+      blogId,
+      data,
+    );
 
     if (!isUpdated) {
-      throw new NotFoundException(`Post with id ${id} not found`);
+      throw new NotFoundException(`Post with id ${postId} not found`);
     }
   }
 }

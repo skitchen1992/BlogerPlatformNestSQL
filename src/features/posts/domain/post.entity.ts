@@ -1,33 +1,45 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Model } from 'mongoose';
-import { getCurrentISOStringDate } from '@utils/dates';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
+import { Blog } from '@features/blogs/domain/blog.entity';
 
-@Schema()
+@Entity('posts')
 export class Post {
-  @Prop({ type: String, require: true, maxlength: 30 })
+  @PrimaryGeneratedColumn('uuid')
+  id?: string;
+
+  @Column({ type: 'varchar', length: 30, nullable: false, name: 'title' })
   title: string;
 
-  @Prop({ type: String, require: true, maxlength: 100 })
-  shortDescription: string;
+  @Column({
+    type: 'varchar',
+    length: 100,
+    nullable: false,
+  })
+  short_description: string;
 
-  @Prop({ type: String, require: true, maxlength: 1000 })
+  @Column({ type: 'varchar', length: 1000, nullable: false })
   content: string;
 
-  @Prop({ type: String, require: true })
-  blogId: string;
+  @Column({ type: 'uuid', nullable: false })
+  blog_id: string;
 
-  @Prop({ type: String, require: true })
-  blogName: string;
+  @Column({ type: 'varchar', nullable: false })
+  blog_name: string;
 
-  @Prop({ type: String, default: getCurrentISOStringDate() })
-  createdAt: string;
+  @CreateDateColumn({
+    type: 'timestamptz',
+    nullable: false,
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  created_at?: Date;
+
+  @ManyToOne(() => Blog, (blog) => blog.posts, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'blog_id' }) // Используем нотацию через нижнее подчеркивание
+  blog?: Blog;
 }
-
-export const PostSchema = SchemaFactory.createForClass(Post);
-//Для загрузки статических методов
-PostSchema.loadClass(Post);
-
-//Types
-export type PostDocument = HydratedDocument<Post>;
-
-export type PostModelType = Model<PostDocument>;

@@ -167,7 +167,7 @@ describe('Users (e2e) GET', () => {
     });
   });
 
-  it('Should get array by filters', async () => {
+  it('Should getUserById array by filters', async () => {
     const userList = [
       { login: 'user01', password: 'string', email: 'email1p@gg.cm' },
       { login: 'user02', password: 'string', email: 'email1p@gg.com' },
@@ -284,7 +284,7 @@ describe('Users (e2e) POST', () => {
     });
   });
 
-  it('Should getById Error while field "login" is too short', async () => {
+  it('Should getBlogById Error while field "login" is too short', async () => {
     const response = await request(app.getHttpServer())
       .post(`${APP_PREFIX}/users`)
       .set(
@@ -299,7 +299,7 @@ describe('Users (e2e) POST', () => {
     expect(response.body).toEqual(data.errorDataSet1);
   });
 
-  it('Should getById Error while field "password" is too long', async () => {
+  it('Should getBlogById Error while field "password" is too long', async () => {
     const response = await request(app.getHttpServer())
       .post(`${APP_PREFIX}/users`)
       .set(
@@ -314,7 +314,7 @@ describe('Users (e2e) POST', () => {
     expect(response.body).toEqual(data.errorDataSet2);
   });
 
-  it('Should getById Error while field "password" is too long', async () => {
+  it('Should getBlogById Error while field "password" is too long', async () => {
     const response = await request(app.getHttpServer())
       .post(`${APP_PREFIX}/users`)
       .set(
@@ -331,7 +331,7 @@ describe('Users (e2e) POST', () => {
 });
 
 describe('Users (e2e) DELETE', () => {
-  it('Should delete user', async () => {
+  it('Should deleteBlogById user', async () => {
     const user = testSeeder.createUserDto();
 
     const result = await dataSource.query(
