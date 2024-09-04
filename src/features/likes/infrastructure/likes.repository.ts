@@ -1,36 +1,56 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import {
-  Like,
-  LikeDocument,
-  LikeModelType,
-  LikeStatusEnum,
-  ParentTypeEnum,
-} from '../domain/likes.entity';
+import { LikeModelType } from '../domain/likes-mongo.entity';
+import { Like, LikeStatusEnum, ParentTypeEnum } from '../domain/likes.entity';
 import { UpdateQuery } from 'mongoose';
 import { ObjectId } from 'mongodb';
+import { InjectDataSource } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
+import { NewLikeDto } from '@features/likes/api/dto/new-like.dto';
 
 @Injectable()
 export class LikesRepository {
-  constructor(@InjectModel(Like.name) private likesModel: LikeModelType) {}
+  constructor(
+    @InjectModel(Like.name) private likesModel: LikeModelType,
+    @InjectDataSource() private dataSource: DataSource,
+  ) {}
 
-  public async create(like: Like): Promise<string> {
-    const insertResult = await this.likesModel.insertMany([like]);
+  public async create(like: NewLikeDto): Promise<string> {
+    try {
+      const result = await this.dataSource.query(
+        `
+      INSERT INTO likes (status, author_id, parent_id, parent_type)
+      VALUES ($1, $2, $3, $4)
+      RETURNING id;
+    `,
+        [like.status, like.authorId, like.parentId, like.parentType],
+      );
 
-    return insertResult[0].id;
+      return result[0].id;
+    } catch (e) {
+      console.error('Error inserting like into database', {
+        error: e,
+      });
+      return '';
+    }
   }
 
   public async get(
     userId: string,
-    commentId: string,
+    parentId: string,
     parentType: ParentTypeEnum,
-  ): Promise<LikeDocument | null> {
+  ): Promise<Like | null> {
     try {
-      const like = await this.likesModel
-        .findOne({
-          $and: [{ authorId: userId }, { parentId: commentId }, { parentType }],
-        })
-        .lean();
+      const likeList = await this.dataSource.query(
+        `
+    SELECT *
+    FROM likes l
+    WHERE l.author_id = $1 AND l.parent_id = $2 AND l.parent_type = $3
+    `,
+        [userId, parentId, parentType],
+      );
+
+      const like = likeList.at(0);
 
       if (!like) {
         return null;
@@ -53,15 +73,26 @@ export class LikesRepository {
     }
   }
 
-  public async update(id: string, data: UpdateQuery<Like>): Promise<boolean> {
+  public async update(
+    likeId: string,
+    likeStatus: LikeStatusEnum,
+  ): Promise<boolean> {
     try {
-      const updatedResult = await this.likesModel.updateOne(
-        { _id: new ObjectId(id) },
-        data,
+      const updateResult = await this.dataSource.query(
+        `
+      UPDATE likes
+      SET status = $2 
+      WHERE id = $1
+      RETURNING id;
+      `,
+        [likeId, likeStatus],
       );
 
-      return updatedResult.matchedCount > 0;
+      return Boolean(updateResult.at(1));
     } catch (e) {
+      console.error('Error updating like into database', {
+        error: e,
+      });
       return false;
     }
   }

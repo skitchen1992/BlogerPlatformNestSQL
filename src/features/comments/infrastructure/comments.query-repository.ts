@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { CommentModelType } from '../domain/comment-mongo.entity';
 import { Comment } from '../domain/comment.entity';
 import { InjectModel } from '@nestjs/mongoose';
 import {
@@ -7,7 +6,6 @@ import {
   CommentOutputDtoMapper,
   ILikesInfo,
 } from '../api/dto/output/comment.output.dto';
-import { Pagination } from '@base/models/pagination.base.model';
 import {
   CommentOutputPaginationDto,
   CommentOutputPaginationDtoMapper,
@@ -18,17 +16,14 @@ import {
   LikeModelType,
   LikeStatusEnum,
   ParentTypeEnum,
-} from '@features/likes/domain/likes.entity';
+} from '@features/likes/domain/likes-mongo.entity';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { Post } from '@features/posts/domain/post.entity';
 
 @Injectable()
 export class CommentsQueryRepository {
   constructor(
-    @InjectModel(Comment.name) private commentModel: CommentModelType,
     @InjectModel(Like.name) private likeModel: LikeModelType,
-    private readonly pagination: Pagination,
     @InjectDataSource() private dataSource: DataSource,
   ) {}
 

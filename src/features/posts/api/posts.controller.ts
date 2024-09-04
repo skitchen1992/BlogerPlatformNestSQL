@@ -39,7 +39,7 @@ import { JwtAuthGuard } from '@infrastructure/guards/bearer-auth-guard.service';
 import { LikeOperationCommand } from '@features/posts/application/handlers/like-operation.handler';
 import { Request } from 'express';
 import { LikeDto } from '@features/posts/api/dto/input/like.input.dto';
-import { ParentTypeEnum } from '@features/likes/domain/likes.entity';
+import { ParentTypeEnum } from '@features/likes/domain/likes-mongo.entity';
 import { BasicAuthGuard } from '@infrastructure/guards/basic-auth-guard.service';
 import { CreateCommentCommand } from '@features/comments/application/handlers/create-comment.handler';
 import { BearerTokenInterceptorGuard } from '@infrastructure/guards/bearer-token-interceptor-guard.service';

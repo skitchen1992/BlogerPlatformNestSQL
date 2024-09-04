@@ -1,7 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { CommentModelType } from '../domain/comment-mongo.entity';
-
 import { Comment } from '../domain/comment.entity';
 import { UpdateCommentDto } from '@features/comments/api/dto/input/update-comment.input.dto';
 import { NewComment } from '@features/comments/api/dto/new-comment.dto';
@@ -10,10 +7,7 @@ import { DataSource } from 'typeorm';
 
 @Injectable()
 export class CommentsRepository {
-  constructor(
-    @InjectModel(Comment.name) private commentsModel: CommentModelType,
-    @InjectDataSource() private dataSource: DataSource,
-  ) {}
+  constructor(@InjectDataSource() private dataSource: DataSource) {}
 
   public async getById(commentId: string): Promise<Comment | null> {
     try {

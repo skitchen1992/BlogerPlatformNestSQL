@@ -6,6 +6,7 @@ import { getUniqueId } from '@utils/utils';
 import { SharedService } from '@infrastructure/servises/shared/shared.service';
 import { User } from '@features/users/domain/user.entity';
 import { EmailConfirmation } from '@features/users/domain/emailConfirmation.entity';
+import { NewUserDto } from '@features/users/api/dto/new-user.dto';
 
 export class RegistrationCommand {
   constructor(
@@ -43,11 +44,10 @@ export class RegistrationHandler
 
     const confirmationCode = getUniqueId();
 
-    const newUser: User = {
+    const newUser: NewUserDto = {
       login,
       password: passwordHash,
       email,
-      created_at: getCurrentISOStringDate(),
     };
 
     const emailConfirmation: EmailConfirmation = {

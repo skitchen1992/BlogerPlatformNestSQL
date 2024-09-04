@@ -7,7 +7,7 @@ import {
   Like,
   LikeStatusEnum,
   ParentTypeEnum,
-} from '@features/likes/domain/likes.entity';
+} from '@features/likes/domain/likes-mongo.entity';
 import { User } from '@features/users/domain/user.entity';
 
 export const testSeeder = {

@@ -14,7 +14,7 @@ import {
 } from '@features/comments/domain/comment-mongo.entity';
 import { IsCommentExistHandler } from '@features/comments/application/handlers/is-comment-exist.handler';
 import { CommentsController } from '@features/comments/api/comments.controller';
-import { Like, LikeSchema } from '@features/likes/domain/likes.entity';
+import { Like, LikeSchema } from '@features/likes/domain/likes-mongo.entity';
 import { UsersModule } from '@features/users/users.module';
 
 const commentsProviders: Provider[] = [

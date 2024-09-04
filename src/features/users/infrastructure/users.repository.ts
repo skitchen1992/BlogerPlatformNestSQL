@@ -5,6 +5,7 @@ import { User } from '@features/users/domain/user.entity';
 import { EmailConfirmation } from '@features/users/domain/emailConfirmation.entity';
 import { RecoveryCodeDto } from '@features/auth/api/dto/recovery-code.dto';
 import { UserJoined } from '@features/users/api/dto/User-joined.dto';
+import { NewUserDto } from '@features/users/api/dto/new-user.dto';
 
 @Injectable()
 export class UsersRepository {
@@ -49,7 +50,7 @@ export class UsersRepository {
   }
 
   public async create(
-    newUser: User,
+    newUser: NewUserDto,
     emailConfirmation?: EmailConfirmation,
   ): Promise<string> {
     try {

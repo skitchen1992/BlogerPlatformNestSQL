@@ -16,7 +16,7 @@ import {
   LikeModelType,
   LikeStatusEnum,
   ParentTypeEnum,
-} from '@features/likes/domain/likes.entity';
+} from '@features/likes/domain/likes-mongo.entity';
 import { NEWEST_LIKES_COUNT } from '@utils/consts';
 import { User, UserModelType } from '@features/users/domain/user-mongo.entity';
 import { InjectDataSource } from '@nestjs/typeorm';
