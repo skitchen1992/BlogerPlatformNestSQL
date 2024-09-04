@@ -24,19 +24,19 @@ export class Like {
   id: string;
 
   @CreateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
-  createdAt: Date;
+  created_at: Date;
 
   @Column({ type: 'varchar', length: 10, default: 'None' })
   status: LikeStatusEnum;
 
   @Column({ type: 'uuid' })
-  authorId: string;
+  author_id: string;
 
   @Column({ type: 'uuid' })
-  parentId: string;
+  parent_id: string;
 
   @Column({ type: 'varchar', length: 10 })
-  parentType: ParentTypeEnum;
+  parent_type: ParentTypeEnum;
 
   @ManyToOne(() => User, (user) => user.likes, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'authorId' })
