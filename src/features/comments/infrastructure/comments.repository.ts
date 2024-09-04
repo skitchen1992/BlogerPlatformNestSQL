@@ -87,12 +87,20 @@ export class CommentsRepository {
     }
   }
 
-  public async delete(id: string): Promise<boolean> {
+  public async delete(commentId: string): Promise<boolean> {
     try {
-      const deleteResult = await this.commentsModel.deleteOne({ _id: id });
+      const result = await this.dataSource.query(
+        `
+      DELETE FROM comments 
+      WHERE id = $1
+      RETURNING *;
+      `,
+        [commentId],
+      );
 
-      return deleteResult.deletedCount === 1;
+      return Boolean(result.at(1));
     } catch (e) {
+      console.error('Error during delete comment operation:', e);
       return false;
     }
   }
