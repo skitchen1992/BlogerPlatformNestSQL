@@ -7,7 +7,6 @@ import { v4 as uuidv4 } from 'uuid';
 import { NewCommentDto } from '@features/comments/api/dto/new-comment.dto';
 import { NewLikeDto } from '@features/likes/api/dto/new-like.dto';
 import {
-  Like,
   LikeStatusEnum,
   ParentTypeEnum,
 } from '@features/likes/domain/likes.entity';
@@ -39,11 +38,6 @@ export const testSeeder = {
         email: `test${index}@gmail.com`,
         password: pass || `123456789${index}`,
         created_at: getCurrentISOStringDate(),
-        // emailConfirmation: {
-        //   confirmationCode: getUniqueId(),
-        //   expirationDate: add(getCurrentISOStringDate(), { hours: 1 }),
-        //   isConfirmed: true,
-        // },
       };
     });
   },
@@ -116,25 +110,6 @@ export const testSeeder = {
       postId,
     };
   },
-
-  // createCommentListDto(
-  //   count: number,
-  //   userId = uuidv4(),
-  //   postId = uuidv4(),
-  // ): Comment[] {
-  //   return new Array(count).fill(null).map((item, i) => {
-  //     return {
-  //       content: `Content Content Content${i}`,
-  //       commentatorInfo: {
-  //         userId,
-  //         userLogin: `login${i}`,
-  //       },
-  //       postId,
-  //       createdAt: getCurrentISOStringDate(),
-  //       _id: new ObjectId(),
-  //     };
-  //   });
-  // },
 
   createPostLikeDto(): NewLikeDto {
     return {

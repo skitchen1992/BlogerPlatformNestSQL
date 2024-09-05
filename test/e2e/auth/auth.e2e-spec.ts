@@ -11,7 +11,7 @@ import request from 'supertest';
 import { APP_PREFIX } from '@settings/apply-app-setting';
 import { testSeeder } from '../../utils/test.seeder';
 
-describe.skip(`Endpoint (POST) - /login`, () => {
+describe(`Endpoint (POST) - /login`, () => {
   it(`Should get status ${HttpStatus.NO_CONTENT}`, async () => {
     const password = 'password';
 
@@ -92,7 +92,7 @@ describe.skip(`Endpoint (POST) - /login`, () => {
   });
 });
 
-describe.skip(`Endpoint (POST) - /registration`, () => {
+describe(`Endpoint (POST) - /registration`, () => {
   it(`Should get status ${HttpStatus.NO_CONTENT}`, async () => {
     await request(app.getHttpServer())
       .post(`${APP_PREFIX}/auth/registration`)
@@ -136,7 +136,7 @@ describe.skip(`Endpoint (POST) - /registration`, () => {
   });
 });
 
-describe.skip(`Endpoint (POST) - /password-recovery`, () => {
+describe(`Endpoint (POST) - /password-recovery`, () => {
   it(`Should get status ${HttpStatus.NO_CONTENT}`, async () => {
     const user = testSeeder.createUserDto();
 
@@ -187,7 +187,7 @@ describe.skip(`Endpoint (POST) - /password-recovery`, () => {
   });
 });
 
-describe.skip(`Endpoint (POST) - /new-password`, () => {
+describe(`Endpoint (POST) - /new-password`, () => {
   it(`Should get status`, async () => {
     const user = testSeeder.createUserDto();
 

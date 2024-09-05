@@ -13,7 +13,7 @@ import { Blog } from '@features/blogs/domain/blog.entity';
 import { NewBlogDto } from '@features/blogs/api/dto/new-blog.dto';
 import { Post } from '@features/posts/domain/post.entity';
 
-describe.skip(`Blogs (e2e) GET - /blogs`, () => {
+describe(`Blogs (e2e) GET - /blogs`, () => {
   it('Should get empty array', async () => {
     const res = await request(app.getHttpServer())
       .get(`${APP_PREFIX}/blogs`)
@@ -135,7 +135,7 @@ describe.skip(`Blogs (e2e) GET - /blogs`, () => {
   });
 });
 
-describe.skip(`Blogs (e2e) GET - /:blogId/posts`, () => {
+describe(`Blogs (e2e) GET - /:blogId/posts`, () => {
   it('Should get filtered array', async () => {
     const blog = testSeeder.createBlogDto();
 
@@ -196,7 +196,7 @@ describe.skip(`Blogs (e2e) GET - /:blogId/posts`, () => {
   });
 });
 
-describe.skip(`Blogs (e2e) GET - /blogs/id`, () => {
+describe(`Blogs (e2e) GET - /blogs/id`, () => {
   it('Should get blog', async () => {
     const blog = testSeeder.createBlogDto();
 
@@ -236,7 +236,7 @@ describe.skip(`Blogs (e2e) GET - /blogs/id`, () => {
   });
 });
 
-describe.skip(`Blogs (e2e) POST - /blogs`, () => {
+describe(`Blogs (e2e) POST - /blogs`, () => {
   it('Should add blog', async () => {
     const blog = testSeeder.createBlogDto();
 
@@ -370,7 +370,7 @@ describe.skip(`Blogs (e2e) POST - /blogs`, () => {
   });
 });
 
-describe.skip(`Blogs (e2e) POST - /:blogId/posts`, () => {
+describe(`Blogs (e2e) POST - /:blogId/posts`, () => {
   it('Should add post for blog', async () => {
     const blog = testSeeder.createBlogDto();
 
@@ -411,7 +411,7 @@ describe.skip(`Blogs (e2e) POST - /:blogId/posts`, () => {
   });
 });
 
-describe.skip(`Blogs (e2e) PUT - /:blogId/posts`, () => {
+describe(`Blogs (e2e) PUT - /:blogId/posts`, () => {
   it('Should update blog', async () => {
     const blog = testSeeder.createBlogDto();
 
@@ -648,7 +648,7 @@ describe.skip(`Blogs (e2e) PUT - /:blogId/posts`, () => {
   });
 });
 
-describe.skip(`Blogs (e2e) DELETE - /:blogId`, () => {
+describe(`Blogs (e2e) DELETE - /:blogId`, () => {
   it('Should deleteBlogById blog', async () => {
     const blog = testSeeder.createBlogDto();
 
