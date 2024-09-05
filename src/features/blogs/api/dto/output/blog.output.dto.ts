@@ -1,4 +1,4 @@
-import { BlogDetails } from '@features/blogs/api/dto/BlogDetais';
+import { Blog } from '@features/blogs/domain/blog.entity';
 
 export class BlogOutputDto {
   id: string;
@@ -11,7 +11,7 @@ export class BlogOutputDto {
 
 // MAPPERS
 
-export const BlogOutputDtoMapper = (blog: BlogDetails): BlogOutputDto => {
+export const BlogOutputDtoMapper = (blog: Blog): BlogOutputDto => {
   const outputDto = new BlogOutputDto();
 
   outputDto.id = blog.id;

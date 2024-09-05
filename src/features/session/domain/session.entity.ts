@@ -10,7 +10,7 @@ import { User } from '@features/users/domain/user.entity';
 @Entity('sessions')
 export class Session {
   @PrimaryGeneratedColumn({ type: 'bigint' })
-  id?: number;
+  id: number;
 
   @Column({ type: 'uuid' })
   user_id: string;

@@ -10,11 +10,6 @@ import { GetMeHandler } from '@features/auth/application/handlers/get-me.handler
 import { AuthController } from '@features/auth/api/auth.controller';
 import { UsersModule } from '@features/users/users.module';
 import { RefreshTokenHandler } from '@features/auth/application/handlers/refresh-token.handler';
-import { MongooseModule } from '@nestjs/mongoose';
-import {
-  Session,
-  SessionSchema,
-} from '@features/session/domain/session-mongo.entity';
 import { SessionModule } from '@features/session/session.module';
 import { LogoutHandler } from '@features/auth/application/handlers/logout.handler';
 
@@ -32,7 +27,6 @@ const authProviders: Provider[] = [
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: Session.name, schema: SessionSchema }]),
     SharedModule,
     forwardRef(() => UsersModule),
     forwardRef(() => SessionModule),

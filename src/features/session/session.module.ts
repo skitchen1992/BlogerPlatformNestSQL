@@ -1,9 +1,4 @@
 import { Module, Provider } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
-import {
-  Session,
-  SessionSchema,
-} from '@features/session/domain/session-mongo.entity';
 import { SessionsRepository } from '@features/session/infrastructure/sessions.repository';
 import { SessionsQueryRepository } from '@features/session/infrastructure/sessions.query-repository';
 import { SessionController } from '@features/session/api/session.controller';
@@ -21,10 +16,7 @@ const sessionProviders: Provider[] = [
 ];
 
 @Module({
-  imports: [
-    MongooseModule.forFeature([{ name: Session.name, schema: SessionSchema }]),
-    SharedModule,
-  ],
+  imports: [SharedModule],
   providers: [...sessionProviders],
   controllers: [SessionController],
   exports: [SessionsRepository, SessionsQueryRepository],

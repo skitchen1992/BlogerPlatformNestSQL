@@ -1,4 +1,4 @@
-export class UserDetails {
+export class UserJoined {
   id: string;
   login: string;
   password: string;

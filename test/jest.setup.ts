@@ -7,7 +7,6 @@ import { ConfigurationType } from '@settings/configuration';
 import { APISettings } from '@settings/api-settings';
 import { EnvironmentSettings } from '@settings/env-settings';
 import { HashBuilder } from '@utils/hash-builder';
-//import { SharedService } from '@infrastructure/servises/shared/shared.service';
 import { JwtService } from '@nestjs/jwt/dist/jwt.service';
 import { DataSource } from 'typeorm';
 import { SharedService } from '@infrastructure/servises/shared/shared.service';
@@ -58,7 +57,7 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
-  const tables = ['users']; // Список всех таблиц, которые нужно очистить
+  const tables = ['users', 'posts', 'blogs']; // Список всех таблиц, которые нужно очистить
 
   for (const table of tables) {
     await dataSource.query(`TRUNCATE TABLE ${table} RESTART IDENTITY CASCADE`);

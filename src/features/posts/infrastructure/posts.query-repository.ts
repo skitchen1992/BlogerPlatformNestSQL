@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
 import {
   ExtendedLikesInfo,
   NewestLike,
@@ -11,85 +10,98 @@ import {
   PostOutputPaginationDtoMapper,
   PostQuery,
 } from '@features/posts/api/dto/output/post.output.pagination.dto';
-import {
-  Like,
-  LikeModelType,
-  LikeStatusEnum,
-  ParentTypeEnum,
-} from '@features/likes/domain/likes.entity';
 import { NEWEST_LIKES_COUNT } from '@utils/consts';
-import { User, UserModelType } from '@features/users/domain/user-mongo.entity';
+import { User } from '@features/users/domain/user.entity';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { PostDetails } from '@features/posts/api/dto/PostDetais';
+import { Post } from '@features/posts/domain/post.entity';
+import { Like, LikeStatusEnum } from '@features/likes/domain/likes.entity';
 
 @Injectable()
 export class PostsQueryRepository {
-  constructor(
-    @InjectModel(User.name) private userModel: UserModelType,
-    @InjectModel(Like.name) private likeModel: LikeModelType,
-    @InjectDataSource() private dataSource: DataSource,
-  ) {}
+  constructor(@InjectDataSource() private dataSource: DataSource) {}
 
   private async getLikeDislikeCounts(
     postId: string,
-  ): Promise<{ likesCount: number; dislikesCount: number }> {
-    const result = await this.likeModel.aggregate([
-      { $match: { parentId: postId, parentType: ParentTypeEnum.POST } },
-      {
-        $group: {
-          _id: null,
-          likesCount: {
-            $sum: { $cond: [{ $eq: ['$status', LikeStatusEnum.LIKE] }, 1, 0] },
-          },
-          dislikesCount: {
-            $sum: {
-              $cond: [{ $eq: ['$status', LikeStatusEnum.DISLIKE] }, 1, 0],
-            },
-          },
-        },
-      },
-    ]);
+  ): Promise<{ likes_count: number; dislikes_count: number }> {
+    const result = await this.dataSource.query(
+      `
+    WITH counts AS (
+        SELECT 
+            COUNT(CASE WHEN status = 'Like' THEN 1 END) AS likes_count,
+            COUNT(CASE WHEN status = 'Dislike' THEN 1 END) AS dislikes_count
+        FROM likes
+        WHERE parent_id = $1
+          AND parent_type = 'Post'
+    )
+    SELECT 
+        COALESCE(likes_count, 0) AS likes_count,
+        COALESCE(dislikes_count, 0) AS dislikes_count
+    FROM counts;
+    `,
+      [postId],
+    );
 
-    return result.length ? result[0] : { likesCount: 0, dislikesCount: 0 };
+    return {
+      likes_count: Number(result.at(0).likes_count),
+      dislikes_count: Number(result.at(0).dislikes_count),
+    };
   }
 
   private async getUserLikeStatus(
     postId: string,
     userId: string,
   ): Promise<LikeStatusEnum> {
-    const user = await this.likeModel
-      .findOne({
-        parentId: postId,
-        parentType: ParentTypeEnum.POST,
-        authorId: userId,
-      })
-      .lean();
+    if (!userId) {
+      return LikeStatusEnum.NONE;
+    }
 
-    return user?.status || LikeStatusEnum.NONE;
+    const result = await this.dataSource.query(
+      `
+    SELECT status
+    FROM likes
+    WHERE parent_id = $1
+      AND parent_type = 'Post'
+      AND author_id = $2
+    LIMIT 1;
+    `,
+      [postId, userId],
+    );
+
+    return result?.at(0)?.status || LikeStatusEnum.NONE;
   }
 
   private async getNewestLikes(
     postId: string,
     count: number,
   ): Promise<NewestLike[]> {
-    const newestLikes = await this.likeModel
-      .find({
-        parentId: postId,
-        parentType: ParentTypeEnum.POST,
-        status: LikeStatusEnum.LIKE,
-      })
-      .sort({ createdAt: -1 })
-      .limit(count)
-      .exec();
+    const newestLikes: Like[] = await this.dataSource.query(
+      `
+    SELECT l.created_at, l.author_id
+    FROM likes l
+    WHERE l.parent_id = $1
+      AND l.parent_type = 'Post'
+      AND l.status = 'Like'
+    ORDER BY l.created_at DESC
+    LIMIT $2;
+    `,
+      [postId, count],
+    );
 
     return await Promise.all(
       newestLikes.map(async (like) => {
-        const user = await this.userModel.findById(like.authorId).exec();
+        const user: User[] = await this.dataSource.query(
+          `
+    SELECT * FROM users u
+     WHERE u.id = $1
+    `,
+          [like.author_id],
+        );
+
         return {
-          addedAt: like.createdAt,
-          userId: like.authorId,
-          login: user ? user.login : '',
+          addedAt: like.created_at.toISOString(),
+          userId: like.author_id,
+          login: user?.at(0)?.login || '',
         };
       }),
     );
@@ -104,8 +116,8 @@ export class PostsQueryRepository {
     const newestLikes = await this.getNewestLikes(postId, NEWEST_LIKES_COUNT);
 
     return {
-      likesCount: likeDislikeCounts.likesCount,
-      dislikesCount: likeDislikeCounts.dislikesCount,
+      likesCount: likeDislikeCounts.likes_count,
+      dislikesCount: likeDislikeCounts.dislikes_count,
       myStatus: likeStatus,
       newestLikes,
     };
@@ -115,12 +127,14 @@ export class PostsQueryRepository {
     postId: string,
   ): Promise<ExtendedLikesInfo> {
     const likeDislikeCounts = await this.getLikeDislikeCounts(postId);
+
     const likeStatus = await this.getUserLikeStatus(postId, '');
+
     const newestLikes = await this.getNewestLikes(postId, NEWEST_LIKES_COUNT);
 
     return {
-      likesCount: likeDislikeCounts.likesCount,
-      dislikesCount: likeDislikeCounts.dislikesCount,
+      likesCount: likeDislikeCounts.likes_count,
+      dislikesCount: likeDislikeCounts.dislikes_count,
       myStatus: likeStatus,
       newestLikes,
     };
@@ -186,8 +200,7 @@ export class PostsQueryRepository {
     }
 
     const collateClause = sortField === 'blog_name' ? 'COLLATE "C"' : '';
-
-    const posts: PostDetails[] = await this.dataSource.query(
+    const posts: Post[] = await this.dataSource.query(
       `
     SELECT *
     FROM

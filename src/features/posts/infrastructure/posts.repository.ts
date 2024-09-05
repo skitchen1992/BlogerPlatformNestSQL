@@ -1,19 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { PostModelType } from '../domain/post-mongo.entity';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { Post } from '@features/posts/domain/post.entity';
-import { IUpdatePostDto } from '@features/posts/api/dto/update-post.dto';
+import { UpdatePostDto } from '@features/posts/api/dto/update-post.dto';
+import { NewPostDto } from '@features/posts/api/dto/new-post.dto';
 
 @Injectable()
 export class PostsRepository {
-  constructor(
-    @InjectModel(Post.name) private postModel: PostModelType,
-    @InjectDataSource() private dataSource: DataSource,
-  ) {}
+  constructor(@InjectDataSource() private dataSource: DataSource) {}
 
-  public async create(newPost: Post): Promise<string> {
+  public async create(newPost: NewPostDto): Promise<string> {
     try {
       const result = await this.dataSource.query(
         `
@@ -23,10 +18,10 @@ export class PostsRepository {
     `,
         [
           newPost.title,
-          newPost.short_description,
+          newPost.shortDescription,
           newPost.content,
-          newPost.blog_id,
-          newPost.blog_name,
+          newPost.blogId,
+          newPost.blogName,
         ],
       );
 
@@ -42,7 +37,7 @@ export class PostsRepository {
   public async update(
     postId: string,
     blogId: string,
-    data: IUpdatePostDto,
+    data: UpdatePostDto,
   ): Promise<boolean> {
     try {
       const updateResult = await this.dataSource.query(

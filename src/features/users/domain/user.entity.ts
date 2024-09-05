@@ -9,11 +9,13 @@ import {
 import { EmailConfirmation } from '@features/users/domain/emailConfirmation.entity';
 import { RecoveryCode } from '@features/users/domain/recoveryCode.entity';
 import { Session } from '@features/session/domain/session.entity';
+import { Comment } from '@features/comments/domain/comment.entity';
+import { Like } from '@features/likes/domain/likes.entity';
 
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn('uuid')
-  id?: string;
+  id: string;
 
   @Column({ type: 'varchar', length: 10 })
   login: string;
@@ -37,4 +39,10 @@ export class User {
 
   @OneToMany(() => Session, (session) => session.user)
   sessions?: Session[];
+
+  @OneToMany(() => Comment, (comment) => comment.user)
+  comments?: Comment[];
+
+  @OneToMany(() => Like, (like) => like.author)
+  likes?: Like[];
 }

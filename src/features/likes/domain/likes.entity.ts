@@ -1,5 +1,12 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Model } from 'mongoose';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
+import { User } from '@features/users/domain/user.entity';
 
 export enum LikeStatusEnum {
   LIKE = 'Like',
@@ -11,34 +18,27 @@ export enum ParentTypeEnum {
   POST = 'Post',
   COMMENT = 'Comment',
 }
-@Schema()
+@Entity('likes')
 export class Like {
-  @Prop({ type: String, require: true })
-  createdAt: string;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
-  @Prop({
-    type: String,
-    require: true,
-    enum: Object.values(LikeStatusEnum),
-    required: true,
-  })
+  @CreateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
+  created_at: Date;
+
+  @Column({ type: 'varchar', length: 10, default: 'None' })
   status: LikeStatusEnum;
 
-  @Prop({ type: String, require: true })
-  authorId: string;
+  @Column({ type: 'uuid' })
+  author_id: string;
 
-  @Prop({ type: String, require: true })
-  parentId: string;
+  @Column({ type: 'uuid' })
+  parent_id: string;
 
-  @Prop({ type: String, enum: Object.values(ParentTypeEnum), required: true })
-  parentType: ParentTypeEnum;
+  @Column({ type: 'varchar', length: 10 })
+  parent_type: ParentTypeEnum;
+
+  @ManyToOne(() => User, (user) => user.likes, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'authorId' })
+  author: User;
 }
-
-export const LikeSchema = SchemaFactory.createForClass(Like);
-//Для загрузки статических методов
-LikeSchema.loadClass(Like);
-
-//Types
-export type LikeDocument = HydratedDocument<Like>;
-
-export type LikeModelType = Model<LikeDocument>;

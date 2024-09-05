@@ -1,11 +1,10 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { LikesRepository } from '@features/likes/infrastructure/likes.repository';
 import {
-  Like,
   LikeStatusEnum,
   ParentTypeEnum,
 } from '@features/likes/domain/likes.entity';
-import { LikesRepository } from '@features/likes/infrastructure/likes.repository';
-import { getCurrentISOStringDate } from '@utils/dates';
+import { NewLikeDto } from '@features/likes/api/dto/new-like.dto';
 
 export class LikeOperationCommand {
   constructor(
@@ -27,12 +26,11 @@ export class LikeOperationHandler
     const like = await this.likesRepository.get(userId, postId, parentType);
 
     if (!like) {
-      const newLike: Like = {
+      const newLike: NewLikeDto = {
         status: likeStatus,
         authorId: userId,
         parentId: postId,
         parentType,
-        createdAt: getCurrentISOStringDate(),
       };
 
       await this.likesRepository.create(newLike);
@@ -40,9 +38,7 @@ export class LikeOperationHandler
     }
 
     if (likeStatus !== like.status) {
-      await this.likesRepository.update(like._id.toString(), {
-        status: likeStatus,
-      });
+      await this.likesRepository.update(like.id, likeStatus);
     }
   }
 }

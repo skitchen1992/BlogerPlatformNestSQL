@@ -10,8 +10,6 @@ import { GetAllHandler } from '@features/blogs/application/handlers/get-all.hand
 import { GetPostForBlogHandler } from '@features/blogs/application/handlers/get-posts-for-blog.handler';
 import { GetBlogHandler } from '@features/blogs/application/handlers/get-blog.handler';
 import { BlogsSAController } from '@features/blogs/api/blogsSAController';
-import { MongooseModule } from '@nestjs/mongoose';
-import { Blog, BlogSchema } from '@features/blogs/domain/blog-mongo.entity';
 import { PostsModule } from '@features/posts/posts.module';
 import { UsersModule } from '@features/users/users.module';
 import { CreatePostHandler } from '@features/posts/application/handlers/create-post.handler';
@@ -36,7 +34,6 @@ const blogsProviders: Provider[] = [
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: Blog.name, schema: BlogSchema }]),
     SharedModule,
     forwardRef(() => PostsModule),
     forwardRef(() => UsersModule),

@@ -1,37 +1,42 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Model } from 'mongoose';
-import { getCurrentISOStringDate } from '@utils/dates';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  JoinColumn,
+  CreateDateColumn,
+} from 'typeorm';
+import { User } from '@features/users/domain/user.entity';
+import { Post } from '@features/posts/domain/post.entity';
 
-export interface ICommentatorInfo {
-  userId: string;
-  userLogin: string;
-}
-@Schema()
+@Entity('comments')
 export class Comment {
-  @Prop({ type: String, require: true, minlength: 20, maxlength: 300 })
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @Column({
+    type: 'varchar',
+    length: 300,
+  })
   content: string;
 
-  @Prop({
-    type: {
-      userId: { type: String, required: true },
-      userLogin: { type: String, required: true },
-    },
-    required: true,
-  })
-  commentatorInfo: ICommentatorInfo;
+  @Column({ type: 'uuid' })
+  user_id: string;
 
-  @Prop({ type: String, require: true })
-  postId: string;
+  @Column({ type: 'varchar', length: 255 })
+  user_login: string;
 
-  @Prop({ type: String, default: getCurrentISOStringDate() })
-  createdAt: string;
+  @Column({ type: 'uuid' })
+  post_id: string;
+
+  @CreateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
+  created_at: Date;
+
+  @ManyToOne(() => User, (user) => user.comments, { onDelete: 'CASCADE' }) // Устанавливаем связь с таблицей пользователей
+  @JoinColumn({ name: 'user_id' })
+  user: User;
+
+  @ManyToOne(() => Post, (post) => post.comments, { onDelete: 'CASCADE' }) // Устанавливаем связь с таблицей постов
+  @JoinColumn({ name: 'post_id' })
+  post: Post;
 }
-
-export const CommentSchema = SchemaFactory.createForClass(Comment);
-//Для загрузки статических методов
-CommentSchema.loadClass(Comment);
-
-//Types
-export type CommentDocument = HydratedDocument<Comment>;
-
-export type CommentModelType = Model<CommentDocument>;

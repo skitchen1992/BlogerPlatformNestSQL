@@ -1,6 +1,5 @@
 import { forwardRef, Module, Provider } from '@nestjs/common';
 import { HashBuilder } from '@utils/hash-builder';
-import { Pagination } from '@base/models/pagination.base.model';
 import { NodeMailer } from '@infrastructure/servises/nodemailer/nodemailer.service';
 import { BasicStrategy } from '@infrastructure/strategies/basic.strategy';
 import { JwtStrategy } from '@infrastructure/strategies/jwt.strategy';
@@ -14,7 +13,6 @@ import { SharedService } from '@infrastructure/servises/shared/shared.service';
 const basesProviders: Provider[] = [
   SharedService,
   HashBuilder,
-  Pagination,
   NodeMailer,
   BasicStrategy,
   JwtStrategy,

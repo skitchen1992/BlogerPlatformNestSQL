@@ -76,7 +76,7 @@ describe(`Endpoint (POST) - /login`, () => {
 
   it(`Should get status ${HttpStatus.BAD_REQUEST}`, async () => {
     await request(app.getHttpServer())
-      .post(`${APP_PREFIX}/users`)
+      .post(`${APP_PREFIX}/sa/users`)
       .set(
         createAuthorizationHeader(
           apiSettings.ADMIN_AUTH_USERNAME,
@@ -109,11 +109,11 @@ describe(`Endpoint (POST) - /registration`, () => {
 
     await dataSource.query(
       `
-      INSERT INTO users (login, password, email, created_at)
-      VALUES ($1, $2, $3, $4)
+      INSERT INTO users (login, password, email)
+      VALUES ($1, $2, $3)
       RETURNING id;
     `,
-      [user.login, user.password, user.email, user.created_at],
+      [user.login, user.password, user.email],
     );
 
     const res = await request(app.getHttpServer())
@@ -142,11 +142,11 @@ describe(`Endpoint (POST) - /password-recovery`, () => {
 
     await dataSource.query(
       `
-      INSERT INTO users (login, password, email, created_at)
-      VALUES ($1, $2, $3, $4)
+      INSERT INTO users (login, password, email)
+      VALUES ($1, $2, $3)
       RETURNING id;
     `,
-      [user.login, user.password, user.email, user.created_at],
+      [user.login, user.password, user.email],
     );
 
     await request(app.getHttpServer())
@@ -162,11 +162,11 @@ describe(`Endpoint (POST) - /password-recovery`, () => {
 
     await dataSource.query(
       `
-      INSERT INTO users (login, password, email, created_at)
-      VALUES ($1, $2, $3, $4)
+      INSERT INTO users (login, password, email)
+      VALUES ($1, $2, $3)
       RETURNING id;
     `,
-      [user.login, user.password, user.email, user.created_at],
+      [user.login, user.password, user.email],
     );
 
     const res = await request(app.getHttpServer())
@@ -193,11 +193,11 @@ describe(`Endpoint (POST) - /new-password`, () => {
 
     const userList = await dataSource.query(
       `
-      INSERT INTO users (login, password, email, created_at)
-      VALUES ($1, $2, $3, $4)
+      INSERT INTO users (login, password, email)
+      VALUES ($1, $2, $3)
       RETURNING id;
     `,
-      [user.login, user.password, user.email, user.created_at],
+      [user.login, user.password, user.email],
     );
 
     const userId = userList.at(0).id;
@@ -230,11 +230,11 @@ describe(`Endpoint (POST) - /new-password`, () => {
 
     const userList = await dataSource.query(
       `
-      INSERT INTO users (login, password, email, created_at)
-      VALUES ($1, $2, $3, $4)
+      INSERT INTO users (login, password, email)
+      VALUES ($1, $2, $3)
       RETURNING id;
     `,
-      [user.login, user.password, user.email, user.created_at],
+      [user.login, user.password, user.email],
     );
 
     const userId = userList.at(0).id;
@@ -273,11 +273,11 @@ describe(`Endpoint (POST) - /new-password`, () => {
 
     const userList = await dataSource.query(
       `
-      INSERT INTO users (login, password, email, created_at)
-      VALUES ($1, $2, $3, $4)
+      INSERT INTO users (login, password, email)
+      VALUES ($1, $2, $3)
       RETURNING id;
     `,
-      [user.login, user.password, user.email, user.created_at],
+      [user.login, user.password, user.email],
     );
 
     const userId = userList.at(0).id;

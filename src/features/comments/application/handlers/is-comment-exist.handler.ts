@@ -14,7 +14,7 @@ export class IsCommentExistHandler
   async execute(command: IsCommentExistCommand): Promise<void> {
     const { commentId } = command;
 
-    const comment = await this.commentsRepository.get(commentId);
+    const comment = await this.commentsRepository.getById(commentId);
 
     if (!comment) {
       throw new NotFoundException(`Comment with id ${commentId} not found`);

@@ -1,22 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { SessionModelType } from '../domain/session-mongo.entity';
-import { UpdateQuery } from 'mongoose';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { Session } from '@features/session/domain/session.entity';
-import { SessionDetails } from '@features/session/api/dto/SessionDetais';
+import { NewSessionDto } from '@features/session/api/dto/new-session.dto';
 
 @Injectable()
 export class SessionsRepository {
-  constructor(
-    @InjectModel(Session.name) private sessionModel: SessionModelType,
-    @InjectDataSource() private dataSource: DataSource,
-  ) {}
+  constructor(@InjectDataSource() private dataSource: DataSource) {}
 
-  public async getSessionByDeviceId(
-    deviceId: string,
-  ): Promise<SessionDetails | null> {
+  public async getSessionByDeviceId(deviceId: string): Promise<Session | null> {
     try {
       const devise = await this.dataSource.query(
         `
@@ -36,7 +28,7 @@ export class SessionsRepository {
     }
   }
 
-  public async create(newSession: Session): Promise<string> {
+  public async create(newSession: NewSessionDto): Promise<string> {
     try {
       const result = await this.dataSource.query(
         `
@@ -45,13 +37,13 @@ export class SessionsRepository {
       RETURNING id;
     `,
         [
-          newSession.user_id,
+          newSession.userId,
           newSession.ip,
           newSession.title,
-          newSession.last_active_date,
-          newSession.token_issue_date,
-          newSession.token_expiration_date,
-          newSession.device_id,
+          newSession.lastActiveDate,
+          newSession.tokenIssueDate,
+          newSession.tokenExpirationDate,
+          newSession.deviceId,
         ],
       );
 
@@ -61,16 +53,6 @@ export class SessionsRepository {
         error: e,
       });
       return '';
-    }
-  }
-
-  public async delete(id: string): Promise<boolean> {
-    try {
-      const deleteResult = await this.sessionModel.deleteOne({ _id: id });
-
-      return deleteResult.deletedCount === 1;
-    } catch (e) {
-      return false;
     }
   }
 
@@ -100,22 +82,6 @@ export class SessionsRepository {
       );
 
       return Boolean(deleteResult.at(1));
-    } catch (e) {
-      return false;
-    }
-  }
-
-  public async update(
-    id: string,
-    data: UpdateQuery<Session>,
-  ): Promise<boolean> {
-    try {
-      const updatedResult = await this.sessionModel.updateOne(
-        { _id: id },
-        data,
-      );
-
-      return updatedResult.matchedCount > 0;
     } catch (e) {
       return false;
     }
