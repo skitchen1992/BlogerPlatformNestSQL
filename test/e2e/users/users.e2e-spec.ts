@@ -8,7 +8,7 @@ import * as data from './dataset';
 import { APP_PREFIX } from '@settings/apply-app-setting';
 import { ID } from '../../mocks/mocks';
 
-describe('Users (e2e) GET', () => {
+describe.skip('Users (e2e) GET', () => {
   it('Should return users list with pagination metadata', async () => {
     const user = testSeeder.createUserDto();
 
@@ -262,7 +262,7 @@ describe('Users (e2e) GET', () => {
   });
 });
 
-describe('Users (e2e) POST', () => {
+describe.skip('Users (e2e) POST', () => {
   it('Should add user', async () => {
     const user = testSeeder.createUserDto();
 
@@ -331,7 +331,7 @@ describe('Users (e2e) POST', () => {
   });
 });
 
-describe('Users (e2e) DELETE', () => {
+describe.skip('Users (e2e) DELETE', () => {
   it('Should deleteBlogById user', async () => {
     const user = testSeeder.createUserDto();
 

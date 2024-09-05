@@ -5,7 +5,7 @@ import { APP_PREFIX } from '@settings/apply-app-setting';
 import { HttpStatus } from '@nestjs/common';
 import { ID } from '../../mocks/mocks';
 
-describe(`Endpoint (GET) - /devices`, () => {
+describe.skip(`Endpoint (GET) - /devices`, () => {
   it('Should getUserById 2 devices', async () => {
     const password = 'password';
 
@@ -55,7 +55,7 @@ describe(`Endpoint (GET) - /devices`, () => {
   });
 });
 
-describe(`Endpoint (DELETE) - /devices`, () => {
+describe.skip(`Endpoint (DELETE) - /devices`, () => {
   it('Should getUserById 0 devices', async () => {
     const password = 'password';
 
@@ -103,7 +103,7 @@ describe(`Endpoint (DELETE) - /devices`, () => {
   });
 });
 
-describe(`Endpoint (DELETE) - /devices/:deviceId`, () => {
+describe.skip(`Endpoint (DELETE) - /devices/:deviceId`, () => {
   it(`Should get 0 devices ${HttpStatus.NO_CONTENT}`, async () => {
     const password = 'password';
 

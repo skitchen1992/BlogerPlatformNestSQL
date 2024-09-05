@@ -3,7 +3,6 @@ import {
   UserOutputDto,
   UserOutputDtoMapper,
 } from '../api/dto/output/user.output.dto';
-import { Pagination } from '@base/models/pagination.base.model';
 import {
   UsersQuery,
   UserOutputPaginationDto,
@@ -14,10 +13,7 @@ import { DataSource } from 'typeorm';
 
 @Injectable()
 export class UsersQueryRepository {
-  constructor(
-    @InjectDataSource() private dataSource: DataSource,
-    private readonly pagination: Pagination,
-  ) {}
+  constructor(@InjectDataSource() private dataSource: DataSource) {}
 
   public async getById(userId: string): Promise<UserOutputDto | null> {
     const user = await this.dataSource.query(

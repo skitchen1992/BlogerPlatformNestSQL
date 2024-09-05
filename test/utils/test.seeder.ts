@@ -7,6 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { NewCommentDto } from '@features/comments/api/dto/new-comment.dto';
 import { NewLikeDto } from '@features/likes/api/dto/new-like.dto';
 import {
+  Like,
   LikeStatusEnum,
   ParentTypeEnum,
 } from '@features/likes/domain/likes.entity';
@@ -77,18 +78,17 @@ export const testSeeder = {
     };
   },
 
-  // createPostListDto(count: number, blogId: string): Post[] {
-  //   return new Array(count).fill(null).map((item, i) => {
-  //     return {
-  //       title: `Nikita${i}`,
-  //       shortDescription: `ShortDescription${i}`,
-  //       content: `Content${i}`,
-  //       blogId,
-  //       blogName: `Blog name${i}`,
-  //       createdAt: getCurrentISOStringDate(),
-  //     };
-  //   });
-  // },
+  createPostListDto(count: number, blogId: string): NewPostDto[] {
+    return new Array(count).fill(null).map((item, i): NewPostDto => {
+      return {
+        title: `Nikita${i}`,
+        shortDescription: `ShortDescription${i}`,
+        content: `Content${i}`,
+        blogId,
+        blogName: `Blog name${i}`,
+      };
+    });
+  },
 
   createDocumentsDto() {
     return {
@@ -145,21 +145,20 @@ export const testSeeder = {
     };
   },
 
-  // createPostLikeListDto(
-  //   count: number,
-  //   parentId: string,
-  //   status: LikeStatusEnum,
-  //   parentType: ParentTypeEnum,
-  //   authorId = uuidv4(),
-  // ): Like[] {
-  //   return new Array(count).fill(null).map(() => {
-  //     return {
-  //       createdAt: getCurrentISOStringDate(),
-  //       status,
-  //       authorId,
-  //       parentId,
-  //       parentType,
-  //     };
-  //   });
-  // },
+  createPostLikeListDto(
+    count: number,
+    parentId: string,
+    status: LikeStatusEnum,
+    parentType: ParentTypeEnum,
+    authorId = uuidv4(),
+  ): NewLikeDto[] {
+    return new Array(count).fill(null).map((): NewLikeDto => {
+      return {
+        status,
+        authorId,
+        parentId,
+        parentType,
+      };
+    });
+  },
 };
