@@ -22,7 +22,7 @@ describe('Users (e2e) GET', () => {
     );
 
     const response = await request(app.getHttpServer())
-      .get(`${APP_PREFIX}/users`)
+      .get(`${APP_PREFIX}/sa/users`)
       .set(
         createAuthorizationHeader(
           apiSettings.ADMIN_AUTH_USERNAME,
@@ -62,7 +62,7 @@ describe('Users (e2e) GET', () => {
     }
 
     const response = await request(app.getHttpServer())
-      .get(`${APP_PREFIX}/users/?pageSize=1&pageNumber=2`)
+      .get(`${APP_PREFIX}/sa/users/?pageSize=1&pageNumber=2`)
       .set(
         createAuthorizationHeader(
           apiSettings.ADMIN_AUTH_USERNAME,
@@ -102,7 +102,7 @@ describe('Users (e2e) GET', () => {
     }
 
     const response = await request(app.getHttpServer())
-      .get(`${APP_PREFIX}/users/?searchLoginTerm=test0`)
+      .get(`${APP_PREFIX}/sa/users/?searchLoginTerm=test0`)
       .set(
         createAuthorizationHeader(
           apiSettings.ADMIN_AUTH_USERNAME,
@@ -142,7 +142,7 @@ describe('Users (e2e) GET', () => {
     }
 
     const response = await request(app.getHttpServer())
-      .get(`${APP_PREFIX}/users/?searchEmailTerm=test0@gmail.com`)
+      .get(`${APP_PREFIX}/sa/users/?searchEmailTerm=test0@gmail.com`)
       .set(
         createAuthorizationHeader(
           apiSettings.ADMIN_AUTH_USERNAME,
@@ -192,7 +192,7 @@ describe('Users (e2e) GET', () => {
     }
     const response = await request(app.getHttpServer())
       .get(
-        `${APP_PREFIX}/users/?pageSize=15&pageNumber=1&searchLoginTerm=seR&searchEmailTerm=.com&sortDirection=asc&sortBy=login`,
+        `${APP_PREFIX}/sa/users/?pageSize=15&pageNumber=1&searchLoginTerm=seR&searchEmailTerm=.com&sortDirection=asc&sortBy=login`,
       )
       .set(
         createAuthorizationHeader(
@@ -266,7 +266,7 @@ describe('Users (e2e) POST', () => {
     const user = testSeeder.createUserDto();
 
     const response = await request(app.getHttpServer())
-      .post(`${APP_PREFIX}/users`)
+      .post(`${APP_PREFIX}/sa/users`)
       .set(
         createAuthorizationHeader(
           apiSettings.ADMIN_AUTH_USERNAME,
@@ -286,7 +286,7 @@ describe('Users (e2e) POST', () => {
 
   it('Should getBlogById Error while field "login" is too short', async () => {
     const response = await request(app.getHttpServer())
-      .post(`${APP_PREFIX}/users`)
+      .post(`${APP_PREFIX}/sa/users`)
       .set(
         createAuthorizationHeader(
           apiSettings.ADMIN_AUTH_USERNAME,
@@ -301,7 +301,7 @@ describe('Users (e2e) POST', () => {
 
   it('Should getBlogById Error while field "password" is too long', async () => {
     const response = await request(app.getHttpServer())
-      .post(`${APP_PREFIX}/users`)
+      .post(`${APP_PREFIX}/sa/users`)
       .set(
         createAuthorizationHeader(
           apiSettings.ADMIN_AUTH_USERNAME,
@@ -316,7 +316,7 @@ describe('Users (e2e) POST', () => {
 
   it('Should getBlogById Error while field "password" is too long', async () => {
     const response = await request(app.getHttpServer())
-      .post(`${APP_PREFIX}/users`)
+      .post(`${APP_PREFIX}/sa/users`)
       .set(
         createAuthorizationHeader(
           apiSettings.ADMIN_AUTH_USERNAME,
@@ -346,7 +346,7 @@ describe('Users (e2e) DELETE', () => {
     const userId = result[0].id;
 
     await request(app.getHttpServer())
-      .delete(`${APP_PREFIX}/users/${userId}`)
+      .delete(`${APP_PREFIX}/sa/users/${userId}`)
       .set(
         createAuthorizationHeader(
           apiSettings.ADMIN_AUTH_USERNAME,
@@ -369,7 +369,7 @@ describe('Users (e2e) DELETE', () => {
     );
 
     await request(app.getHttpServer())
-      .delete(`${APP_PREFIX}/users/${ID}`)
+      .delete(`${APP_PREFIX}/sa/users/${ID}`)
       .set(
         createAuthorizationHeader(
           apiSettings.ADMIN_AUTH_USERNAME,

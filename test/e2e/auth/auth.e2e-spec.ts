@@ -76,7 +76,7 @@ describe(`Endpoint (POST) - /login`, () => {
 
   it(`Should get status ${HttpStatus.BAD_REQUEST}`, async () => {
     await request(app.getHttpServer())
-      .post(`${APP_PREFIX}/users`)
+      .post(`${APP_PREFIX}/sa/users`)
       .set(
         createAuthorizationHeader(
           apiSettings.ADMIN_AUTH_USERNAME,
