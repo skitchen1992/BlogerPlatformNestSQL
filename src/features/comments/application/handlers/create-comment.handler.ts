@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CommentsRepository } from '@features/comments/infrastructure/comments.repository';
-import { NewComment } from '@features/comments/api/dto/new-comment.dto';
+import { NewCommentDto } from '@features/comments/api/dto/new-comment.dto';
 
 export class CreateCommentCommand {
   constructor(
@@ -19,7 +19,7 @@ export class CreateCommentHandler
   async execute(command: CreateCommentCommand): Promise<string> {
     const { content, userId, userLogin, postId } = command;
 
-    const newComment: NewComment = {
+    const newComment: NewCommentDto = {
       content,
       userId,
       userLogin,

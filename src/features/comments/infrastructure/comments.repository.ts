@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Comment } from '../domain/comment.entity';
 import { UpdateCommentDto } from '@features/comments/api/dto/input/update-comment.input.dto';
-import { NewComment } from '@features/comments/api/dto/new-comment.dto';
+import { NewCommentDto } from '@features/comments/api/dto/new-comment.dto';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 
@@ -32,7 +32,7 @@ export class CommentsRepository {
     }
   }
 
-  public async create(newComment: NewComment): Promise<string> {
+  public async create(newComment: NewCommentDto): Promise<string> {
     try {
       const result = await this.dataSource.query(
         `

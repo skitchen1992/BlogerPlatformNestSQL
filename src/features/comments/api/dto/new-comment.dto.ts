@@ -1,4 +1,4 @@
-export class NewComment {
+export class NewCommentDto {
   content: string;
   userId: string;
   userLogin: string;

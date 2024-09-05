@@ -14,11 +14,11 @@ describe('Users (e2e) GET', () => {
 
     await dataSource.query(
       `
-      INSERT INTO users (login, password, email, created_at)
-      VALUES ($1, $2, $3, $4)
+      INSERT INTO users (login, password, email)
+      VALUES ($1, $2, $3)
       RETURNING id;
     `,
-      [user.login, user.password, user.email, user.created_at],
+      [user.login, user.password, user.email],
     );
 
     const response = await request(app.getHttpServer())
@@ -190,6 +190,7 @@ describe('Users (e2e) GET', () => {
         [user.login, user.password, user.email, getCurrentISOStringDate()],
       );
     }
+
     const response = await request(app.getHttpServer())
       .get(
         `${APP_PREFIX}/sa/users/?pageSize=15&pageNumber=1&searchLoginTerm=seR&searchEmailTerm=.com&sortDirection=asc&sortBy=login`,

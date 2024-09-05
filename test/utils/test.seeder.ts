@@ -1,23 +1,22 @@
 import { getCurrentISOStringDate } from '@utils/dates';
-import { Blog } from '@features/blogs/domain/blog-mongo.entity';
-import { Post } from '@features/posts/domain/post-mongo.entity';
-import { ObjectId } from 'mongodb';
-import { Comment } from '@features/comments/domain/comment-mongo.entity';
+import { User } from '@features/users/domain/user.entity';
+import { NewUserDto } from '@features/users/api/dto/new-user.dto';
+import { NewBlogDto } from '@features/blogs/api/dto/new-blog.dto';
+import { NewPostDto } from '@features/posts/api/dto/new-post.dto';
+import { v4 as uuidv4 } from 'uuid';
+import { NewCommentDto } from '@features/comments/api/dto/new-comment.dto';
+import { NewLikeDto } from '@features/likes/api/dto/new-like.dto';
 import {
-  Like,
   LikeStatusEnum,
   ParentTypeEnum,
-} from '@features/likes/domain/likes-mongo.entity';
-import { User } from '@features/users/domain/user.entity';
+} from '@features/likes/domain/likes.entity';
 
 export const testSeeder = {
-  createUserDto(): User {
+  createUserDto(): NewUserDto {
     return {
-      id: '',
       login: 'test',
       email: 'test@gmail.com',
       password: '123456789',
-      created_at: getCurrentISOStringDate(),
     };
   },
 
@@ -48,51 +47,48 @@ export const testSeeder = {
     });
   },
 
-  createBlogDto(): Blog {
+  createBlogDto(): NewBlogDto {
     return {
       name: 'Test',
       description: 'Test description',
       websiteUrl: 'https://string.com',
-      createdAt: getCurrentISOStringDate(),
       isMembership: false,
     };
   },
 
-  createBlogListDto(count: number): Blog[] {
-    return new Array(count).fill(null).map((item, i) => {
+  createBlogListDto(count: number): NewBlogDto[] {
+    return new Array(count).fill(null).map((item, i): NewBlogDto => {
       return {
         name: `Test${i}`,
         description: `Test description${i}`,
         websiteUrl: `https://string${i}.com`,
-        createdAt: getCurrentISOStringDate(),
         isMembership: false,
       };
     });
   },
 
-  createPostDto(blogId: string): Post {
+  createPostDto(blogId: string): NewPostDto {
     return {
       title: 'Nikita',
       shortDescription: 'ShortDescription',
       content: 'Content',
       blogId,
       blogName: 'Blog name',
-      createdAt: getCurrentISOStringDate(),
     };
   },
 
-  createPostListDto(count: number, blogId: string): Post[] {
-    return new Array(count).fill(null).map((item, i) => {
-      return {
-        title: `Nikita${i}`,
-        shortDescription: `ShortDescription${i}`,
-        content: `Content${i}`,
-        blogId,
-        blogName: `Blog name${i}`,
-        createdAt: getCurrentISOStringDate(),
-      };
-    });
-  },
+  // createPostListDto(count: number, blogId: string): Post[] {
+  //   return new Array(count).fill(null).map((item, i) => {
+  //     return {
+  //       title: `Nikita${i}`,
+  //       shortDescription: `ShortDescription${i}`,
+  //       content: `Content${i}`,
+  //       blogId,
+  //       blogName: `Blog name${i}`,
+  //       createdAt: getCurrentISOStringDate(),
+  //     };
+  //   });
+  // },
 
   createDocumentsDto() {
     return {
@@ -112,65 +108,58 @@ export const testSeeder = {
     });
   },
 
-  createCommentDto(
-    userId = new ObjectId().toString(),
-    postId = new ObjectId().toString(),
-  ): Comment {
+  createCommentDto(userId = uuidv4(), postId = uuidv4()): NewCommentDto {
     return {
       content: 'Content Content Content',
-      commentatorInfo: {
-        userId,
-        userLogin: 'login',
-      },
+      userId,
+      userLogin: 'login',
       postId,
-      createdAt: getCurrentISOStringDate(),
     };
   },
 
-  createCommentListDto(
-    count: number,
-    userId = new ObjectId().toString(),
-    postId = new ObjectId().toString(),
-  ): Comment[] {
-    return new Array(count).fill(null).map((item, i) => {
-      return {
-        content: `Content Content Content${i}`,
-        commentatorInfo: {
-          userId,
-          userLogin: `login${i}`,
-        },
-        postId,
-        createdAt: getCurrentISOStringDate(),
-        _id: new ObjectId(),
-      };
-    });
-  },
+  // createCommentListDto(
+  //   count: number,
+  //   userId = uuidv4(),
+  //   postId = uuidv4(),
+  // ): Comment[] {
+  //   return new Array(count).fill(null).map((item, i) => {
+  //     return {
+  //       content: `Content Content Content${i}`,
+  //       commentatorInfo: {
+  //         userId,
+  //         userLogin: `login${i}`,
+  //       },
+  //       postId,
+  //       createdAt: getCurrentISOStringDate(),
+  //       _id: new ObjectId(),
+  //     };
+  //   });
+  // },
 
-  createPostLikeDto(): Like {
+  createPostLikeDto(): NewLikeDto {
     return {
-      createdAt: getCurrentISOStringDate(),
       status: LikeStatusEnum.LIKE,
-      authorId: new ObjectId().toString(),
-      parentId: new ObjectId().toString(),
+      authorId: uuidv4(),
+      parentId: uuidv4(),
       parentType: ParentTypeEnum.POST,
     };
   },
 
-  createPostLikeListDto(
-    count: number,
-    parentId: string,
-    status: LikeStatusEnum,
-    parentType: ParentTypeEnum,
-    authorId = new ObjectId().toString(),
-  ): Like[] {
-    return new Array(count).fill(null).map(() => {
-      return {
-        createdAt: getCurrentISOStringDate(),
-        status,
-        authorId,
-        parentId,
-        parentType,
-      };
-    });
-  },
+  // createPostLikeListDto(
+  //   count: number,
+  //   parentId: string,
+  //   status: LikeStatusEnum,
+  //   parentType: ParentTypeEnum,
+  //   authorId = uuidv4(),
+  // ): Like[] {
+  //   return new Array(count).fill(null).map(() => {
+  //     return {
+  //       createdAt: getCurrentISOStringDate(),
+  //       status,
+  //       authorId,
+  //       parentId,
+  //       parentType,
+  //     };
+  //   });
+  // },
 };

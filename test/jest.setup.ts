@@ -58,7 +58,7 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
-  const tables = ['users']; // Список всех таблиц, которые нужно очистить
+  const tables = ['users', 'posts', 'blogs']; // Список всех таблиц, которые нужно очистить
 
   for (const table of tables) {
     await dataSource.query(`TRUNCATE TABLE ${table} RESTART IDENTITY CASCADE`);
