@@ -7,7 +7,6 @@ import { ConfigurationType } from '@settings/configuration';
 import { APISettings } from '@settings/api-settings';
 import { EnvironmentSettings } from '@settings/env-settings';
 import { HashBuilder } from '@utils/hash-builder';
-//import { SharedService } from '@infrastructure/servises/shared/shared.service';
 import { JwtService } from '@nestjs/jwt/dist/jwt.service';
 import { DataSource } from 'typeorm';
 import { SharedService } from '@infrastructure/servises/shared/shared.service';

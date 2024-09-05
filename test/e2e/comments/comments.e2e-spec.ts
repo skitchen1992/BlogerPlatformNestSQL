@@ -1800,7 +1800,7 @@ describe(`Endpoint (PUT) - /:commentId/like-status`, () => {
 
     const newComment = testSeeder.createCommentDto(userId, postId);
 
-    const result: Comment[] = await dataSource.query(
+    await dataSource.query(
       `
       INSERT INTO comments (content, user_id, user_login, post_id)
       VALUES ($1, $2, $3, $4)

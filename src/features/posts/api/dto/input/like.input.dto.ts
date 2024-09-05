@@ -1,6 +1,6 @@
 import { Trim } from '@infrastructure/decorators/transform/trim';
 import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
-import { LikeStatusEnum } from '@features/likes/domain/likes-mongo.entity';
+import { LikeStatusEnum } from '@features/likes/domain/likes.entity';
 
 export class LikeDto {
   @IsNotEmpty({ message: 'Title is required' })

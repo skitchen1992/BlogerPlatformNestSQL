@@ -1,5 +1,5 @@
-import { LikeStatusEnum } from '@features/likes/domain/likes-mongo.entity';
 import { Comment } from '@features/comments/domain/comment.entity';
+import { LikeStatusEnum } from '@features/likes/domain/likes.entity';
 
 export interface ILikesInfo {
   likesCount: number;

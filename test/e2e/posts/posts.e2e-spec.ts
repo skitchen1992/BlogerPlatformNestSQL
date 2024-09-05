@@ -2385,12 +2385,10 @@ describe(`Endpoint (PUT) - /:postId/like-status`, () => {
       [user.login],
     );
 
-    const token = await request(app.getHttpServer())
-      .post(`${APP_PREFIX}/auth/login`)
-      .send({
-        loginOrEmail: user.login,
-        password: user.password,
-      });
+    await request(app.getHttpServer()).post(`${APP_PREFIX}/auth/login`).send({
+      loginOrEmail: user.login,
+      password: user.password,
+    });
 
     const userId = userList[0].id;
 
@@ -2529,7 +2527,7 @@ describe(`Endpoint (PUT) - /:postId/like-status`, () => {
 
     const comment = testSeeder.createCommentDto(userId, postId);
 
-    const result: Comment[] = await dataSource.query(
+    await dataSource.query(
       `
       INSERT INTO comments (content, user_id, user_login, post_id)
       VALUES ($1, $2, $3, $4)

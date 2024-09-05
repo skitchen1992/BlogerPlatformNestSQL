@@ -1,6 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { BlogModelType } from '../domain/blog-mongo.entity';
 import { Blog } from '@features/blogs/domain/blog.entity';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
@@ -9,10 +7,7 @@ import { NewBlogDto } from '@features/blogs/api/dto/new-blog.dto';
 
 @Injectable()
 export class BlogsRepository {
-  constructor(
-    @InjectModel(Blog.name) private blogModel: BlogModelType,
-    @InjectDataSource() private dataSource: DataSource,
-  ) {}
+  constructor(@InjectDataSource() private dataSource: DataSource) {}
 
   public async getBlogById(blogId: string): Promise<Blog | null> {
     try {

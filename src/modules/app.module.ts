@@ -1,5 +1,4 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
 import { LoggerMiddleware } from '@infrastructure/middlewares/logger.middleware';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -60,16 +59,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
           },
         ];
       },
-    }),
-    MongooseModule.forRootAsync({
-      useFactory: (configService: ConfigService<ConfigurationType, true>) => {
-        const apiSettings = configService.get('apiSettings', { infer: true });
-
-        return {
-          uri: apiSettings.MONGO_CONNECTION_URI,
-        };
-      },
-      inject: [ConfigService],
     }),
     TypeOrmModule.forRootAsync({
       useFactory: (configService: ConfigService<ConfigurationType, true>) => {

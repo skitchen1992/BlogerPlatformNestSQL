@@ -1,18 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { LikeModelType } from '../domain/likes-mongo.entity';
 import { Like, LikeStatusEnum, ParentTypeEnum } from '../domain/likes.entity';
-import { ObjectId } from 'mongodb';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { NewLikeDto } from '@features/likes/api/dto/new-like.dto';
 
 @Injectable()
 export class LikesRepository {
-  constructor(
-    @InjectModel(Like.name) private likesModel: LikeModelType,
-    @InjectDataSource() private dataSource: DataSource,
-  ) {}
+  constructor(@InjectDataSource() private dataSource: DataSource) {}
 
   public async create(like: NewLikeDto): Promise<string> {
     try {
@@ -60,18 +54,6 @@ export class LikesRepository {
     }
   }
 
-  public async delete(id: string): Promise<boolean> {
-    try {
-      const deleteResult = await this.likesModel.deleteOne({
-        _id: new ObjectId(id),
-      });
-
-      return deleteResult.deletedCount === 1;
-    } catch (e) {
-      return false;
-    }
-  }
-
   public async update(
     likeId: string,
     likeStatus: LikeStatusEnum,
@@ -94,42 +76,5 @@ export class LikesRepository {
       });
       return false;
     }
-  }
-
-  public async getLikeDislikeCounts(
-    commentId: string,
-  ): Promise<{ likesCount: number; dislikesCount: number }> {
-    const result = await this.likesModel.aggregate([
-      { $match: { parentId: commentId, parentType: ParentTypeEnum.COMMENT } },
-      {
-        $group: {
-          _id: null,
-          likesCount: {
-            $sum: { $cond: [{ $eq: ['$status', LikeStatusEnum.LIKE] }, 1, 0] },
-          },
-          dislikesCount: {
-            $sum: {
-              $cond: [{ $eq: ['$status', LikeStatusEnum.DISLIKE] }, 1, 0],
-            },
-          },
-        },
-      },
-    ]);
-
-    return result.length ? result[0] : { likesCount: 0, dislikesCount: 0 };
-  }
-  public async getUserLikeStatus(
-    commentId: string,
-    userId: string,
-  ): Promise<LikeStatusEnum> {
-    const user = await this.likesModel
-      .findOne({
-        parentId: commentId,
-        parentType: ParentTypeEnum.COMMENT,
-        authorId: userId,
-      })
-      .lean();
-
-    return user?.status || LikeStatusEnum.NONE;
   }
 }

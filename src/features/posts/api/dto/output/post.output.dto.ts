@@ -1,5 +1,5 @@
-import { LikeStatusEnum } from '@features/likes/domain/likes-mongo.entity';
 import { Post } from '@features/posts/domain/post.entity';
+import { LikeStatusEnum } from '@features/likes/domain/likes.entity';
 
 export type NewestLike = {
   addedAt: string;
